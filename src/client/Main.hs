@@ -16,6 +16,9 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Common.Hello (hello) where
+module Main (main) where
 
-hello = "Hello, world"
+import Hello
+
+main = do
+  putStrLn (hello "client")

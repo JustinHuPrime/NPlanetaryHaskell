@@ -1,0 +1,25 @@
+cradle:
+  cabal:
+    - path: "src/server/Main.hs"
+      component: "NPlanetary:exe:server"
+
+    - path: "src/common/Main.hs"
+      component: "NPlanetary:exe:server"
+
+    - path: "src/client/Main.hs"
+      component: "NPlanetary:exe:client"
+
+    - path: "src/common/Main.hs"
+      component: "NPlanetary:exe:client"
+
+    - path: "src/client"
+      component: "NPlanetary:test:test"
+
+    - path: "src/server"
+      component: "NPlanetary:test:test"
+
+    - path: "src/common"
+      component: "NPlanetary:test:test"
+
+    - path: "src/test"
+      component: "NPlanetary:test:test"

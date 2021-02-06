@@ -16,9 +16,10 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Main where
+module Main (main) where
 
-import Common.Hello
+import Hello
+import Network.Socket
 
 main = do
-  putStrLn "Hello, world!"
+  putStrLn (hello "Server")

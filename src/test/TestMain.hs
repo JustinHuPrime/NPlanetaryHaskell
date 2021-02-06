@@ -16,9 +16,13 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Main where
+module Main (main) where
 
-import Common.Hello
+import Test.HUnit
+import Hello
 
-main = do
-  putStrLn hello
+test1 = TestCase (assertEqual "hello" "Hello, server!" (hello "server"))
+
+tests = TestList [test1]
+
+main = runTestTT tests
