@@ -29,15 +29,20 @@ updateBoard ml = postOrderTick . resolveOrders ml . preOrderTick
 
 --- updates the board before the orders phase
 preOrderTick :: Board -> Board
-preOrderTick b = b
+preOrderTick b = b -- TODO
 
 --- resolves a list of orders
 resolveOrders :: [Move] -> Board -> Board
-resolveOrders ml b = b
+resolveOrders ml b = foldr resolveOrder b ml
+
+--- resolves an order
+resolveOrder :: Move -> Board -> Board
+resolveOrder (Thrust idNum vec) b = b -- TODO
+resolveOrder (Attack attacker defender) b = b -- TODO
 
 --- updates the board after the orders phase
 postOrderTick :: Board -> Board
-postOrderTick b = b
+postOrderTick b = b -- TODO
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
