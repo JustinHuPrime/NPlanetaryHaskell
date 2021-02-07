@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt install libgl-dev
+        sudo apt install libgl-dev libglu1-mesa-dev
         cabal update
         cabal build --only-dependencies --enable-tests --enable-benchmarks
     - name: Build
