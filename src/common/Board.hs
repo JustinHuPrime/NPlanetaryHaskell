@@ -19,6 +19,8 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module Board where
 
 import qualified Data.ByteString.Char8 as B
+import Data.Maybe
+import Text.Read
 import Util
 
 type Board = [Entity]
@@ -90,19 +92,58 @@ serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuel
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
 parseBoard :: B.ByteString -> Board
-parseBoard s = []
+parseBoard s = mapMaybe parseEntity (B.split '\x1C' (B.init s))
 
 --- parses a bytestring representing an entity into that entity, or nothing if it's invalid
 parseEntity :: B.ByteString -> Maybe Entity
-parseEntity s = Nothing
+parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
+  where
+    parseEntityHelper ["AstroObj", idNum, x, y, name, mass, radius] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      mass' <- parseDouble mass
+      radius' <- parseDouble radius
+      return (AstroObj idNum' (x', y') name mass' radius')
+    parseEntityHelper ["AsteroidCluster", idNum, x, y] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      return (AsteroidCluster idNum' (x', y'))
+    parseEntityHelper ["Ship", idNum, x, y, dx, dy, owner, name, strength, isDefensive, fuelCap, fuel, weaponHealth, driveHealth, structureHealth] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      dx' <- parseDouble dx
+      dy' <- parseDouble dy
+      owner' <- parseInt owner
+      strength' <- parseInt strength
+      isDefensive' <- parseBool isDefensive
+      fuelCap' <- parseDouble fuelCap
+      fuel' <- parseDouble fuel
+      weaponHealth' <- parseInt weaponHealth
+      driveHealth' <- parseInt driveHealth
+      structureHealth' <- parseInt structureHealth
+      return (Ship idNum' (x', y') (dx', dy') owner' name strength' isDefensive' fuelCap' fuel' weaponHealth' driveHealth' structureHealth')
+    parseEntityHelper _ = Nothing
 
 --- serializes an integer as a bytestring
 serializeInt :: Int -> B.ByteString
 serializeInt = B.pack . show
 
+--- parses an integer as a bytestring
+parseInt :: String -> Maybe Int
+parseInt s = readMaybe s :: Maybe Int
+
 --- serializes a double as a bytestring
 serializeDouble :: Double -> B.ByteString
 serializeDouble x = B.pack (show (round (x * fixedPointPrecision) :: Int))
+
+--- parses a double as a bytestring
+parseDouble :: String -> Maybe Double
+parseDouble s = do
+  fixedPoint <- parseInt s
+  return (fromIntegral fixedPoint / fixedPointPrecision)
 
 --- precision for fixed point numbers
 fixedPointPrecision :: Double
@@ -116,3 +157,9 @@ serializeEntityList = B.intercalate (B.singleton '\x1D')
 serializeBool :: Bool -> B.ByteString
 serializeBool True = B.singleton 'T'
 serializeBool False = B.singleton 'F'
+
+--- parses a boolean from a string
+parseBool :: String -> Maybe Bool
+parseBool "T" = Just True
+parseBool "F" = Just False
+parseBool _ = Nothing
