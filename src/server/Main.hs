@@ -30,14 +30,18 @@ import System.Exit
 import Text.Read
 
 handler :: Socket -> IO ()
-handler c = do
-  msg <- recv c 1024
-  sendAll c msg
+handler s = do
+  msg <- recv s 1024
+  sendAll s msg
   C.putStrLn msg
+  msg <- recv s 1024
+  return ()
 
 loop :: Int -> Socket -> IO ()
-loop 0 s = do
-  return ()
+loop 1 s = do
+  (conn, _) <- accept s
+  handler conn
+  gracefulClose conn 5000
 loop numPlayers s = do
   (conn, _) <- accept s
   void (forkFinally (handler conn) (const (gracefulClose conn 5000)))
@@ -77,6 +81,7 @@ main = do
           putStrLn "Number of players must be at least two"
           exitWith (ExitFailure 1)
         | otherwise -> do
+          putStrLn "N-Planetary server version 0.1.0"
           server numPlayers
       Nothing -> do
         putStrLn "Could not parse the number of players"

@@ -33,6 +33,8 @@ loop s = do
   sendAll s "Hello!"
   msg <- recv s 1024
   C.putStrLn msg
+  msg <- recv s 1024
+  return ()
 
 client :: String -> IO ()
 client serverAddr = do
@@ -55,6 +57,7 @@ main = do
       putStrLn "Expected one argument - the address of the server"
       exitWith (ExitFailure 1)
     else do
+      putStrLn "N-Planetary client version 0.1.0"
       client (head args)
 
 -- get arguments, expecting one and only arg to be server address
