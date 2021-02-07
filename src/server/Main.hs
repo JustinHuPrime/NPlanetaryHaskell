@@ -23,12 +23,12 @@ import Control.Concurrent
 import qualified Control.Concurrent.Lock as Lock
 import qualified Control.Exception as E
 import Control.Monad
-import qualified Data.ByteString.Char8 as C
 import Data.IORef
+import Engine
 import Move
 import NetInterface
 import Network.Socket
-import Network.Socket.ByteString
+import Networking
 import System.Environment
 import System.Exit
 import Text.Read
@@ -50,11 +50,33 @@ If the list is `numPlayers` long:
 
 handler :: Socket -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Int -> Int -> IO ()
 handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers playerId = do
-  msg <- recv s 1024
-  sendAll s msg
-  C.putStrLn msg
-  _ <- recv s 1024
-  return ()
+  -- send out initial board state
+  initBoard <- readIORef board
+  sendBoard s initBoard
+  forever
+    ( do
+        -- get list of moves
+        b <- readIORef board
+        moves <- validateMoves b playerId <$> readMoves s b
+        Lock.acquire moveListLock
+        ml <- readIORef moveList
+        writeIORef moveList (moves : ml)
+        if length moves == numPlayers
+          then
+            let updated = updateBoard b ml
+             in do
+                  writeIORef board updated
+                  signalQSemN newBoardSem (numPlayers - 1)
+                  sendBoard s updated
+                  waitQSemN sentBoardSem (numPlayers - 1)
+                  Lock.release moveListLock
+          else do
+            Lock.release moveListLock
+            waitQSemN newBoardSem 1
+            updated <- readIORef board
+            sendBoard s updated
+            signalQSemN sentBoardSem 1
+    )
 
 loop :: Int -> Int -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Socket -> IO ()
 loop 1 numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do

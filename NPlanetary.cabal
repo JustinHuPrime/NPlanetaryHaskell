@@ -25,7 +25,7 @@ source-repository head
 
 executable nplanetary-server
   main-is:             Main.hs
-  other-modules:       
+  other-modules:       Engine, Networking, Balance, Board, Move, NetInterface, Util
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -34,12 +34,12 @@ executable nplanetary-server
     concurrent-extra
   hs-source-dirs:      src/server src/common
   default-language:    Haskell2010
-  ghc-options:         -Wall -Wno-missing-home-modules
+  ghc-options:         -Wall
 
 
 executable nplanetary-client
   main-is:             Main.hs
-  other-modules:       
+  other-modules:       Board, Move, NetInterface
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -49,7 +49,7 @@ executable nplanetary-client
     concurrent-extra
   hs-source-dirs:      src/client src/common
   default-language:    Haskell2010
-  ghc-options:         -Wall -Wno-missing-home-modules
+  ghc-options:         -Wall
 
 
 Test-Suite test
@@ -66,4 +66,4 @@ Test-Suite test
     QuickCheck
   hs-source-dirs:      src/client src/server src/common src/test
   default-language:    Haskell2010
-  ghc-options:         -Wall -Wno-missing-home-modules
+  ghc-options:         -Wall
