@@ -41,9 +41,9 @@ data Entity
     ---  - whether or not it's defensive only
     ---  - fuel capacity (in delta-v)
     ---  - fuel quantity (in delta-v)
-    ---  - Weapon health
-    ---  - Drive health
-    ---  - Structure health
+    ---  - Weapon damage
+    ---  - Drive damage
+    ---  - Structure damage
     Ship Int Vec2 Vec2 Int String Int Bool Double Double Int Int Int
   deriving (Show, Eq)
 
@@ -54,6 +54,10 @@ getEntityId (Ship idNum _ _ _ _ _ _ _ _ _ _ _) = idNum
 
 findId :: Int -> Board -> Maybe Entity
 findId idNum = find (\e -> idNum == getEntityId e)
+
+isShip :: Entity -> Bool
+isShip Ship {} = True
+isShip _ = False
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
 serializeBoard :: Board -> B.ByteString
@@ -79,7 +83,7 @@ serializeEntity (AsteroidCluster idNum (x, y)) =
       serializeDouble x,
       serializeDouble y
     ]
-serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuelCap fuel weaponHealth driveHealth structureHealth) =
+serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuelCap fuel weaponDamage driveDamage structureDamage) =
   serializeGroupList
     [ B.pack "Ship",
       serializeInt idNum,
@@ -93,9 +97,9 @@ serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuel
       serializeBool isDefensive,
       serializeDouble fuelCap,
       serializeDouble fuel,
-      serializeInt weaponHealth,
-      serializeInt driveHealth,
-      serializeInt structureHealth
+      serializeInt weaponDamage,
+      serializeInt driveDamage,
+      serializeInt structureDamage
     ]
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
@@ -119,7 +123,7 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
       x' <- parseDouble x
       y' <- parseDouble y
       return (AsteroidCluster idNum' (x', y'))
-    parseEntityHelper ["Ship", idNum, x, y, dx, dy, owner, name, strength, isDefensive, fuelCap, fuel, weaponHealth, driveHealth, structureHealth] = do
+    parseEntityHelper ["Ship", idNum, x, y, dx, dy, owner, name, strength, isDefensive, fuelCap, fuel, weaponDamage, driveDamage, structureDamage] = do
       idNum' <- parseInt idNum
       x' <- parseDouble x
       y' <- parseDouble y
@@ -130,8 +134,8 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
       isDefensive' <- parseBool isDefensive
       fuelCap' <- parseDouble fuelCap
       fuel' <- parseDouble fuel
-      weaponHealth' <- parseInt weaponHealth
-      driveHealth' <- parseInt driveHealth
-      structureHealth' <- parseInt structureHealth
-      return (Ship idNum' (x', y') (dx', dy') owner' name strength' isDefensive' fuelCap' fuel' weaponHealth' driveHealth' structureHealth')
+      weaponDamage' <- parseInt weaponDamage
+      driveDamage' <- parseInt driveDamage
+      structureDamage' <- parseInt structureDamage
+      return (Ship idNum' (x', y') (dx', dy') owner' name strength' isDefensive' fuelCap' fuel' weaponDamage' driveDamage' structureDamage')
     parseEntityHelper _ = Nothing

@@ -30,6 +30,6 @@ mapBorder = 50
 thrustDeltaV :: Double
 thrustDeltaV = 1
 
---- max health of any health category
-maxHealth :: Int
-maxHealth = 6
+--- max damage of any health category
+maxDamage :: Int
+maxDamage = 6
