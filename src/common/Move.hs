@@ -5,5 +5,6 @@ import Util
 data Move
   = --- thust the ship with given id the given amount
     Thrust Int Vec2
-
--- TODO: fill this in
+  | --- launch a mine from the given ship
+    Attack Int Int
+  deriving (Show)
