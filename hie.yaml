@@ -66,6 +66,12 @@ cradle:
     - path: "src/client/Networking.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
+    - path: "src/client/UI.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/client/Util.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
     - path: "src/common/Board.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
@@ -76,6 +82,12 @@ cradle:
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/common/Networking.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/UI.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/Util.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client"

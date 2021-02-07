@@ -39,7 +39,7 @@ executable nplanetary-server
 
 executable nplanetary-client
   main-is:             Main.hs
-  other-modules:       Board, Move, NetInterface, Networking
+  other-modules:       Board, Move, NetInterface, Networking, UI, Util
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
