@@ -64,6 +64,12 @@ isShip :: Entity -> Bool
 isShip Ship {} = True
 isShip _ = False
 
+--- is this entity always visible?
+alwaysVisible :: Entity -> Bool
+alwaysVisible AstroObj {} = True
+alwaysVisible AsteroidCluster {} = True
+alwaysVisible _ = False
+
 --- is ship owned by given player
 isPlayerShip :: Int -> Entity -> Bool
 isPlayerShip playerId (Ship _ _ _ owner _ _ _ _ _ _ _ _) = playerId == owner

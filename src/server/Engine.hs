@@ -73,6 +73,3 @@ filterVisible b playerId =
     b
   where
     playerShips = filter (isPlayerShip playerId) b
-    alwaysVisible AstroObj {} = True
-    alwaysVisible AsteroidCluster {} = True
-    alwaysVisible _ = False
