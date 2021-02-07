@@ -28,3 +28,7 @@ updateBoard b ml = b -- TODO
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
 validateMoves b playerId ml = ml -- TODO
+
+--- filters out entities not visible to a player
+filterVisible :: Board -> Int -> Board
+filterVisible b playerId = b -- TODO
