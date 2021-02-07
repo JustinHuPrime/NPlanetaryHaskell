@@ -13,9 +13,9 @@ shipViewRadius :: Double
 shipViewRadius = 3
 
 --- max distance to a ship/ordnance that a player's base can see
-baseViewRadius :: Double 
+baseViewRadius :: Double
 baseViewRadius = 5
 
 --- max distance away from the sun anything can go before it's 'destroyed'
-mapBorder :: Double 
+mapBorder :: Double
 mapBorder = 50

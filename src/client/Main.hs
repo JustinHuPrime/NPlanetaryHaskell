@@ -15,35 +15,41 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
-
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main (main) where
 
+import Board
+import qualified Control.Concurrent.Lock as Lock
+import qualified Control.Exception as E
+import qualified Data.ByteString.Char8 as C
+import Data.IORef
+import Move
+import NetInterface
 import Network.Socket
 import Network.Socket.ByteString
 import System.Environment
 import System.Exit
-import NetInterface
-import qualified Control.Exception as E
-import qualified Data.ByteString.Char8 as C
 
-loop :: Socket -> IO ()
-loop s = do
+loop :: IORef Board -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
+loop board moveList lock s = do
   sendAll s "Hello!"
   msg <- recv s 1024
   C.putStrLn msg
-  msg <- recv s 1024
+  _ <- recv s 1024
   return ()
 
 client :: String -> IO ()
 client serverAddr = do
+  board <- newIORef [] :: IO (IORef Board)
+  moveList <- newIORef [] :: IO (IORef [Move])
+  lock <- Lock.new
   addr <- resolve serverAddr
-  E.bracket (open addr) close loop
+  E.bracket (open addr) close (loop board moveList lock)
   exitSuccess
   where
     resolve addr = do
-      head <$> getAddrInfo (Just (defaultHints { addrSocketType = Stream })) (Just addr) (Just port)
+      head <$> getAddrInfo (Just (defaultHints {addrSocketType = Stream})) (Just addr) (Just port)
     open addr = do
       sock <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
       connect sock (addrAddress addr)

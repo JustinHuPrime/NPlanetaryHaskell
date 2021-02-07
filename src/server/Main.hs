@@ -18,10 +18,14 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Main (main) where
 
+import Board
 import Control.Concurrent
+import qualified Control.Concurrent.Lock as Lock
 import qualified Control.Exception as E
 import Control.Monad
 import qualified Data.ByteString.Char8 as C
+import Data.IORef
+import Move
 import NetInterface
 import Network.Socket
 import Network.Socket.ByteString
@@ -29,31 +33,34 @@ import System.Environment
 import System.Exit
 import Text.Read
 
-handler :: Socket -> IO ()
-handler s = do
+handler :: Socket -> IORef Board -> IORef [Move] -> Lock.Lock -> IO ()
+handler s board moveList lock = do
   msg <- recv s 1024
   sendAll s msg
   C.putStrLn msg
-  msg <- recv s 1024
+  _ <- recv s 1024
   return ()
 
-loop :: Int -> Socket -> IO ()
-loop 1 s = do
+loop :: Int -> IORef Board -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
+loop 1 board moveList lock s = do
   (conn, _) <- accept s
-  handler conn
+  handler conn board moveList lock
   gracefulClose conn 5000
-loop numPlayers s = do
+loop numPlayers board moveList lock s = do
   (conn, _) <- accept s
-  void (forkFinally (handler conn) (const (gracefulClose conn 5000)))
-  loop (numPlayers - 1) s
+  void (forkFinally (handler conn board moveList lock) (const (gracefulClose conn 5000)))
+  loop (numPlayers - 1) board moveList lock s
 
 server :: Int -> IO ()
 server numPlayers = do
+  board <- newIORef [] :: IO (IORef Board)
+  moveList <- newIORef [] :: IO (IORef [Move])
+  lock <- Lock.new
   addr <- resolve
-  E.bracket (open addr) close (loop numPlayers)
+  E.bracket (open addr) close (loop numPlayers board moveList lock)
   exitSuccess
   where
-    resolve = do
+    resolve =
       let hints =
             defaultHints
               { addrFlags = [AI_PASSIVE],
