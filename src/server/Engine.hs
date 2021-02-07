@@ -18,7 +18,6 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Engine where
 
-import Balance
 import Board
 import Move
 import Util
@@ -31,6 +30,7 @@ updateBoard b ml = b -- TODO
 validateMoves :: Board -> Int -> [Move] -> [Move]
 validateMoves b playerId = filter (validMove b playerId)
 
+-- TODO: test this function
 validMove :: Board -> Int -> Move -> Bool
 validMove b playerId (Thrust idNum vec) =
   case ship of
