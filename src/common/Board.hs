@@ -91,8 +91,9 @@ serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuel
     ]
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
+--- does not expect the terminating EOT
 parseBoard :: B.ByteString -> Board
-parseBoard s = mapMaybe parseEntity (B.split '\x1C' (B.init s))
+parseBoard s = mapMaybe parseEntity (B.split '\x1C' s)
 
 --- parses a bytestring representing an entity into that entity, or nothing if it's invalid
 parseEntity :: B.ByteString -> Maybe Entity
