@@ -63,7 +63,7 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
         writeIORef moveList (moves : ml)
         if length moves == numPlayers
           then
-            let updated = updateBoard b ml
+            let updated = updateBoard (concat ml) b
              in do
                   writeIORef board updated
                   signalQSemN newBoardSem (numPlayers - 1)

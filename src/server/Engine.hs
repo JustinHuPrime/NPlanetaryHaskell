@@ -24,8 +24,20 @@ import Move
 import Util
 
 --- updates a board given a list of validated moves
-updateBoard :: Board -> [[Move]] -> Board
-updateBoard b ml = b -- TODO
+updateBoard :: [Move] -> Board -> Board
+updateBoard ml = postOrderTick . resolveOrders ml . preOrderTick
+
+--- updates the board before the orders phase
+preOrderTick :: Board -> Board
+preOrderTick b = b
+
+--- resolves a list of orders
+resolveOrders :: [Move] -> Board -> Board
+resolveOrders ml b = b
+
+--- updates the board after the orders phase
+postOrderTick :: Board -> Board
+postOrderTick b = b
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
