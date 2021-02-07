@@ -15,37 +15,48 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Main (main) where
 
 import Board
 import qualified Control.Concurrent.Lock as Lock
 import qualified Control.Exception as E
-import qualified Data.ByteString.Char8 as C
 import Data.IORef
+import Graphics.UI.GLUT
 import Move
 import NetInterface
 import Network.Socket
-import Network.Socket.ByteString
-import System.Environment
+import Networking
 import System.Exit
+import UI
 
-loop :: IORef Board -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
-loop board moveList lock s = do
-  sendAll s "Hello!"
-  msg <- recv s 1024
-  C.putStrLn msg
-  _ <- recv s 1024
-  return ()
+openWindow :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
+openWindow board boardLock moveList moveListLock s = do
+  initBoard <- readBoard s
+  writeIORef board initBoard
+
+  -- TODO: are there any additional options we need to pass?
+  initialDisplayMode $= [DoubleBuffered]
+  -- TODO: probably need to setup openGL versions and such
+  _ <- createWindow "N-Planetary"
+  fullScreen
+
+  displayCallback $= display board boardLock
+  -- TODO: add more input callbacks as needed
+  keyboardMouseCallback $= Just (keyboardMouse board boardLock moveList moveListLock)
+  idleCallback $= Just (idle board boardLock)
+  closeCallback $= Just (close s)
+
+  mainLoop
 
 client :: String -> IO ()
 client serverAddr = do
   board <- newIORef [] :: IO (IORef Board)
+  boardLock <- Lock.new
   moveList <- newIORef [] :: IO (IORef [Move])
-  lock <- Lock.new
+  moveListLock <- Lock.new
   addr <- resolve serverAddr
-  E.bracket (open addr) close (loop board moveList lock)
+  E.bracket (open addr) close (openWindow board boardLock moveList moveListLock)
   exitSuccess
   where
     resolve addr = do
@@ -57,7 +68,7 @@ client serverAddr = do
 
 main :: IO ()
 main = do
-  args <- getArgs
+  (_, args) <- getArgsAndInitialize
   if length args /= 1
     then do
       putStrLn "Expected one argument - the address of the server"

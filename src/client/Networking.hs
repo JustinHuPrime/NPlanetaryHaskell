@@ -16,20 +16,20 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Balance where
+module Networking where
 
---- max distance to a ship/ordnance that a player's ship can see
-shipViewRadius :: Double
-shipViewRadius = 3
+import Board
+import Move
+import Network.Socket
 
---- max distance away from the sun anything can go before it's 'destroyed'
-mapBorder :: Double
-mapBorder = 50
+--- reads a board from the server
+readBoard :: Socket -> IO Board
+readBoard s = do
+  -- TODO: implement this
+  return []
 
---- max delta-v a ship can provide in a normal thrust
-thrustDeltaV :: Double
-thrustDeltaV = 1
-
---- max health of any health category
-maxHealth :: Int
-maxHealth = 6
+--- sends a list of moves down the socket
+sendMoves :: Socket -> [Move] -> IO ()
+sendMoves s ml = do
+  -- TODO: implement this
+  return ()
