@@ -18,6 +18,7 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Board where
 
+import qualified Data.ByteString.Char8 as B
 import Util
 
 type Board = [Entity]
@@ -42,3 +43,76 @@ data Entity
     ---  - Structure health
     Ship Int Vec2 Vec2 Int String Int Bool Double Double Int Int Int
   deriving (Show)
+
+--- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
+serializeBoard :: Board -> B.ByteString
+serializeBoard b = B.intercalate (B.singleton '\x1C') (map serializeEntity b) `B.snoc` '\x03'
+
+--- serializes an entity, avoiding the file separator and end-of-transmission bytes
+--- serialized entity consists of a series of things separated with group separators
+--- subsequent levels use record separators then unit separators
+serializeEntity :: Entity -> B.ByteString
+serializeEntity (AstroObj idNum (x, y) name mass radius) =
+  serializeEntityList
+    [ B.pack "AstroObj",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y,
+      B.pack name,
+      serializeDouble mass,
+      serializeDouble radius
+    ]
+serializeEntity (AsteroidCluster idNum (x, y)) =
+  serializeEntityList
+    [ B.pack "AsteroidCluster",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y
+    ]
+serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuelCap fuel weaponHealth driveHealth structureHealth) =
+  serializeEntityList
+    [ B.pack "Ship",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y,
+      serializeDouble dx,
+      serializeDouble dy,
+      serializeInt owner,
+      B.pack name,
+      serializeInt strength,
+      serializeBool isDefensive,
+      serializeDouble fuelCap,
+      serializeDouble fuel,
+      serializeInt weaponHealth,
+      serializeInt driveHealth,
+      serializeInt structureHealth
+    ]
+
+--- parses a bytestring representing a board into a list of entities, ignoring invalid ones
+parseBoard :: B.ByteString -> Board
+parseBoard s = []
+
+--- parses a bytestring representing an entity into that entity, or nothing if it's invalid
+parseEntity :: B.ByteString -> Maybe Entity
+parseEntity s = Nothing
+
+--- serializes an integer as a bytestring
+serializeInt :: Int -> B.ByteString
+serializeInt = B.pack . show
+
+--- serializes a double as a bytestring
+serializeDouble :: Double -> B.ByteString
+serializeDouble x = B.pack (show (round (x * fixedPointPrecision) :: Int))
+
+--- precision for fixed point numbers
+fixedPointPrecision :: Double
+fixedPointPrecision = 10000
+
+--- serializes an entity's list of bytestrings
+serializeEntityList :: [B.ByteString] -> B.ByteString
+serializeEntityList = B.intercalate (B.singleton '\x1D')
+
+--- serializes a boolean into a bytestring
+serializeBool :: Bool -> B.ByteString
+serializeBool True = B.singleton 'T'
+serializeBool False = B.singleton 'F'
