@@ -21,7 +21,6 @@ module Networking where
 import Board
 import Move
 import Network.Socket
-import Network.Socket.ByteString
 
 --- sends a board down the socket
 sendBoard :: Socket -> Board -> IO ()
