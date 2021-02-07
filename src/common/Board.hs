@@ -44,7 +44,7 @@ data Entity
     ---  - Drive health
     ---  - Structure health
     Ship Int Vec2 Vec2 Int String Int Bool Double Double Int Int Int
-  deriving (Show)
+  deriving (Show, Eq)
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
 serializeBoard :: Board -> B.ByteString
