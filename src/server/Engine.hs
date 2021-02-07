@@ -30,7 +30,6 @@ updateBoard b ml = b -- TODO
 validateMoves :: Board -> Int -> [Move] -> [Move]
 validateMoves b playerId = filter (validMove b playerId)
 
--- TODO: test this function
 validMove :: Board -> Int -> Move -> Bool
 validMove b playerId (Thrust idNum vec) =
   case ship of
