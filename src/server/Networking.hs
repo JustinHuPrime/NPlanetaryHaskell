@@ -20,6 +20,7 @@ module Networking where
 
 import Board
 import Move
+import NetInterface
 import Network.Socket
 import Network.Socket.ByteString
 
@@ -29,6 +30,4 @@ sendBoard s b = sendAll s (serializeBoard b)
 
 --- reads the list of moves from the client
 readMoves :: Socket -> IO [Move]
-readMoves s = do
-  -- TODO: implement this
-  return []
+readMoves s = parseMoveList <$> readPacket s

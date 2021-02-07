@@ -22,6 +22,7 @@ import Board
 import Move
 import NetInterface
 import Network.Socket
+import Network.Socket.ByteString
 
 --- reads a board from the server
 readBoard :: Socket -> IO Board
@@ -30,5 +31,4 @@ readBoard s = parseBoard <$> readPacket s
 --- sends a list of moves down the socket
 sendMoves :: Socket -> [Move] -> IO ()
 sendMoves s ml = do
-  -- TODO: implement this
-  return ()
+  sendAll s (serializeMoveList ml)
