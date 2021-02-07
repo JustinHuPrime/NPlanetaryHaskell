@@ -21,11 +21,10 @@ module TestBoard where
 
 import Board
 import qualified Data.ByteString.Char8 as B
-import Data.Char
-import Serializing
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
+import TestUtils
 
 instance Arbitrary Entity where
   arbitrary =
@@ -74,9 +73,3 @@ prop_endsWithEOT b = B.last (serializeBoard b) == '\x03'
 
 prop_roundTrip :: Board -> Bool
 prop_roundTrip b = b == parseBoard (B.init (serializeBoard b))
-
-limitPrecision :: RealFrac a => a -> Double
-limitPrecision x = fromIntegral (round x :: Int) / fixedPointPrecision
-
-forceAscii :: String -> String
-forceAscii = filter (\c -> 32 <= ord c && ord c <= 126)
