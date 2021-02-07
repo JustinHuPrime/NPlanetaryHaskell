@@ -20,7 +20,7 @@ module Board where
 
 import qualified Data.ByteString.Char8 as B
 import Data.Maybe
-import Text.Read
+import Serializing
 import Util
 
 type Board = [Entity]
@@ -52,10 +52,9 @@ serializeBoard b = B.intercalate (B.singleton '\x1C') (map serializeEntity b) `B
 
 --- serializes an entity, avoiding the file separator and end-of-transmission bytes
 --- serialized entity consists of a series of things separated with group separators
---- subsequent levels use record separators then unit separators
 serializeEntity :: Entity -> B.ByteString
 serializeEntity (AstroObj idNum (x, y) name mass radius) =
-  serializeEntityList
+  serializeGroupList
     [ B.pack "AstroObj",
       serializeInt idNum,
       serializeDouble x,
@@ -65,14 +64,14 @@ serializeEntity (AstroObj idNum (x, y) name mass radius) =
       serializeDouble radius
     ]
 serializeEntity (AsteroidCluster idNum (x, y)) =
-  serializeEntityList
+  serializeGroupList
     [ B.pack "AsteroidCluster",
       serializeInt idNum,
       serializeDouble x,
       serializeDouble y
     ]
 serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuelCap fuel weaponHealth driveHealth structureHealth) =
-  serializeEntityList
+  serializeGroupList
     [ B.pack "Ship",
       serializeInt idNum,
       serializeDouble x,
@@ -127,40 +126,3 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
       structureHealth' <- parseInt structureHealth
       return (Ship idNum' (x', y') (dx', dy') owner' name strength' isDefensive' fuelCap' fuel' weaponHealth' driveHealth' structureHealth')
     parseEntityHelper _ = Nothing
-
---- serializes an integer as a bytestring
-serializeInt :: Int -> B.ByteString
-serializeInt = B.pack . show
-
---- parses an integer as a bytestring
-parseInt :: String -> Maybe Int
-parseInt s = readMaybe s :: Maybe Int
-
---- serializes a double as a bytestring
-serializeDouble :: Double -> B.ByteString
-serializeDouble x = B.pack (show (round (x * fixedPointPrecision) :: Int))
-
---- parses a double as a bytestring
-parseDouble :: String -> Maybe Double
-parseDouble s = do
-  fixedPoint <- parseInt s
-  return (fromIntegral fixedPoint / fixedPointPrecision)
-
---- precision for fixed point numbers
-fixedPointPrecision :: Double
-fixedPointPrecision = 10000
-
---- serializes an entity's list of bytestrings
-serializeEntityList :: [B.ByteString] -> B.ByteString
-serializeEntityList = B.intercalate (B.singleton '\x1D')
-
---- serializes a boolean into a bytestring
-serializeBool :: Bool -> B.ByteString
-serializeBool True = B.singleton 'T'
-serializeBool False = B.singleton 'F'
-
---- parses a boolean from a string
-parseBool :: String -> Maybe Bool
-parseBool "T" = Just True
-parseBool "F" = Just False
-parseBool _ = Nothing

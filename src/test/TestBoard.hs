@@ -22,6 +22,7 @@ module TestBoard where
 import Board
 import qualified Data.ByteString.Char8 as B
 import Data.Char
+import Serializing
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
