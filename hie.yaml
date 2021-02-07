@@ -6,22 +6,10 @@ cradle:
     - path: "src/common/Main.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
-    - path: "src/server/Hello.hs"
-      component: "NPlanetary:exe:nplanetary-server"
-
-    - path: "src/common/Hello.hs"
-      component: "NPlanetary:exe:nplanetary-server"
-
     - path: "src/client/Main.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/common/Main.hs"
-      component: "NPlanetary:exe:nplanetary-client"
-
-    - path: "src/client/Hello.hs"
-      component: "NPlanetary:exe:nplanetary-client"
-
-    - path: "src/common/Hello.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client"
