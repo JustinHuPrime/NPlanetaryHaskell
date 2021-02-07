@@ -15,14 +15,53 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 module TestUtils where
 
+import Board
 import Data.Char
 import Serializing
+import Test.QuickCheck
 
 limitPrecision :: RealFrac a => a -> Double
 limitPrecision x = fromIntegral (round x :: Int) / fixedPointPrecision
 
 forceAscii :: String -> String
 forceAscii = filter (\c -> 32 <= ord c && ord c <= 126)
+
+instance Arbitrary Entity where
+  arbitrary =
+    oneof
+      [ do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          name <- arbitrary
+          mass <- (arbitrary :: Gen Double)
+          radius <- (arbitrary :: Gen Double)
+          return (AstroObj idNum (limitPrecision x, limitPrecision y) (forceAscii name) (limitPrecision mass) (limitPrecision radius)),
+        do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          return (AsteroidCluster idNum (limitPrecision x, limitPrecision y)),
+        do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          dx <- (arbitrary :: Gen Double)
+          dy <- (arbitrary :: Gen Double)
+          owner <- arbitrary
+          name <- arbitrary
+          strength <- arbitrary
+          isDefensive <- arbitrary
+          fuelCap <- (arbitrary :: Gen Double)
+          fuel <- (arbitrary :: Gen Double)
+          weaponDamage <- arbitrary
+          driveDamage <- arbitrary
+          structureDamage <- arbitrary
+          return (Ship idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy) owner (forceAscii name) strength isDefensive (limitPrecision fuelCap) (limitPrecision fuel) weaponDamage driveDamage structureDamage)
+      ]
+
+-- TODO: make this generate more sensible data, e.g. non-silly owner numbers
