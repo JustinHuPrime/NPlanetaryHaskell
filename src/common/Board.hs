@@ -19,6 +19,7 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module Board where
 
 import qualified Data.ByteString.Char8 as B
+import Data.List
 import Data.Maybe
 import Serializing
 import Util
@@ -45,6 +46,14 @@ data Entity
     ---  - Structure health
     Ship Int Vec2 Vec2 Int String Int Bool Double Double Int Int Int
   deriving (Show, Eq)
+
+getEntityId :: Entity -> Int
+getEntityId (AstroObj idNum _ _ _ _) = idNum
+getEntityId (AsteroidCluster idNum _) = idNum
+getEntityId (Ship idNum _ _ _ _ _ _ _ _ _ _ _) = idNum
+
+findId :: Int -> Board -> Maybe Entity
+findId idNum = find (\e -> idNum == getEntityId e)
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
 serializeBoard :: Board -> B.ByteString
