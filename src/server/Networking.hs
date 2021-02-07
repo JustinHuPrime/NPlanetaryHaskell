@@ -30,7 +30,7 @@ sendBoard s b = do
   return ()
 
 --- reads the list of moves from the client
-readMoves :: Socket -> Board -> IO [Move]
-readMoves s b = do
+readMoves :: Socket -> IO [Move]
+readMoves s = do
   -- TODO: implement this
   return []

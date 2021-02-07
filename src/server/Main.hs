@@ -57,7 +57,7 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
     ( do
         -- get list of moves
         b <- readIORef board
-        moves <- validateMoves b playerId <$> readMoves s b
+        moves <- validateMoves b playerId <$> readMoves s
         Lock.acquire moveListLock
         ml <- readIORef moveList
         writeIORef moveList (moves : ml)
