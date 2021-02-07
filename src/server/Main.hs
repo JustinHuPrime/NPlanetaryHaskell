@@ -33,8 +33,8 @@ import System.Environment
 import System.Exit
 import Text.Read
 
-handler :: Socket -> IORef Board -> IORef [Move] -> Lock.Lock -> IO ()
-handler s board moveList lock = do
+handler :: Socket -> IORef Board -> IORef [Move] -> Lock.Lock -> Int -> IO ()
+handler s board moveList lock playerId = do
   msg <- recv s 1024
   sendAll s msg
   C.putStrLn msg
@@ -44,11 +44,11 @@ handler s board moveList lock = do
 loop :: Int -> IORef Board -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
 loop 1 board moveList lock s = do
   (conn, _) <- accept s
-  handler conn board moveList lock
+  handler conn board moveList lock 1
   gracefulClose conn 5000
 loop numPlayers board moveList lock s = do
   (conn, _) <- accept s
-  void (forkFinally (handler conn board moveList lock) (const (gracefulClose conn 5000)))
+  void (forkFinally (handler conn board moveList lock numPlayers) (const (gracefulClose conn 5000)))
   loop (numPlayers - 1) board moveList lock s
 
 server :: Int -> IO ()
