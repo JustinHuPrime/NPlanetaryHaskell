@@ -18,7 +18,18 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Main (main) where
 
-import Hello
+import System.Environment
+import System.Exit
 
 main = do
-  putStrLn (hello "client")
+  args <- getArgs
+  if length args /= 1 then do
+    putStrLn "Expected one argument - the address of the server"
+    exitWith (ExitFailure 1)
+  else do
+    exitSuccess
+
+  -- get arguments, expecting one and only arg to be server address
+  -- connect to server, get world state
+  -- open gui window, display world state, on mouse, change world state (!), eventually send world state
+  -- get world state, repeat previous

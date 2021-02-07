@@ -18,8 +18,27 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Main (main) where
 
-import Hello
 import Network.Socket
+import System.Environment
+import System.Exit
+import Text.Read
 
 main = do
-  putStrLn (hello "Server")
+  args <- getArgs
+  if length args /= 1 then do
+    putStrLn "Expected one argument - the number of players"
+    exitWith (ExitFailure 1)
+  else do
+    case (readMaybe (head args) :: Maybe Int) of
+      Just numPlayers | numPlayers <= 1 -> do
+        putStrLn "Number of players must be at least two"
+        exitWith (ExitFailure 1)
+                      | otherwise -> exitSuccess
+      Nothing -> do
+        putStrLn "Could not parse the number of players"
+        exitWith (ExitFailure 1)
+  -- get arguments, expecting one and only arg to be number of players
+  -- open server, initialize world state
+  -- when player connects, remember that and assign them a colour out of [Red, Green, Blue, Yellow]
+  -- wait for packet from all players
+  -- update world state, send update packet out

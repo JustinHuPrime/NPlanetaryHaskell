@@ -25,7 +25,7 @@ source-repository head
 
 executable nplanetary-server
   main-is:             Main.hs
-  other-modules:       Hello
+  other-modules:       
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -36,7 +36,7 @@ executable nplanetary-server
 
 executable nplanetary-client
   main-is:             Main.hs
-  other-modules:       Hello
+  other-modules:       
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -49,7 +49,7 @@ executable nplanetary-client
 Test-Suite test
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  other-modules:       Hello
+  other-modules:       
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
