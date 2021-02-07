@@ -78,15 +78,15 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
             signalQSemN sentBoardSem 1
     )
 
-loop :: Int -> Int -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Socket -> IO ()
-loop 1 numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
+acceptConns :: Int -> Int -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Socket -> IO ()
+acceptConns 1 numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
   (conn, _) <- accept s
   handler conn board newBoardSem sentBoardSem moveList moveListLock numPlayers 1
   gracefulClose conn 5000
-loop currentPlayer numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
+acceptConns currentPlayer numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
   (conn, _) <- accept s
   void (forkFinally (handler conn board newBoardSem sentBoardSem moveList moveListLock numPlayers currentPlayer) (const (gracefulClose conn 5000)))
-  loop (currentPlayer - 1) numPlayers board newBoardSem sentBoardSem moveList moveListLock s
+  acceptConns (currentPlayer - 1) numPlayers board newBoardSem sentBoardSem moveList moveListLock s
 
 server :: Int -> IO ()
 server numPlayers = do
@@ -96,7 +96,7 @@ server numPlayers = do
   moveList <- newIORef [] :: IO (IORef [[Move]])
   moveListLock <- Lock.new
   addr <- resolve
-  E.bracket (open addr) close (loop numPlayers numPlayers board newBoardSem sentBoardSem moveList moveListLock)
+  E.bracket (open addr) close (acceptConns numPlayers numPlayers board newBoardSem sentBoardSem moveList moveListLock)
   exitSuccess
   where
     resolve =
