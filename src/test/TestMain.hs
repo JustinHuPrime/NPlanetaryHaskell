@@ -19,10 +19,9 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module Main (main) where
 
 import Test.HUnit
-import Hello
 
-test1 = TestCase (assertEqual "hello" "Hello, server!" (hello "server"))
+tests :: Test
+tests = TestList []
 
-tests = TestList [test1]
-
+main :: IO Counts
 main = runTestTT tests

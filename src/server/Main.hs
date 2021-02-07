@@ -87,6 +87,9 @@ main = do
         | numPlayers <= 1 -> do
           putStrLn "Number of players must be at least two"
           exitWith (ExitFailure 1)
+        | numPlayers > 4 -> do
+          putStrLn "Number of players must be less than four"
+          exitWith (ExitFailure 1)
         | otherwise -> do
           putStrLn "N-Planetary server version 0.1.0"
           server numPlayers
