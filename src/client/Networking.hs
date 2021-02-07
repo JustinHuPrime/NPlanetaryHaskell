@@ -20,13 +20,12 @@ module Networking where
 
 import Board
 import Move
+import NetInterface
 import Network.Socket
 
 --- reads a board from the server
 readBoard :: Socket -> IO Board
-readBoard s = do
-  -- TODO: implement this
-  return []
+readBoard s = parseBoard <$> readPacket s
 
 --- sends a list of moves down the socket
 sendMoves :: Socket -> [Move] -> IO ()
