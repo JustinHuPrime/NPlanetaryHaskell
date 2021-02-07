@@ -19,3 +19,6 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module Util where
 
 type Vec2 = (Double, Double)
+
+magnitude :: Vec2 -> Double
+magnitude (x, y) = sqrt (x ** 2 + y ** 2)
