@@ -17,7 +17,7 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module TestBoard where
+module TestFilterVisible where
 
 import Balance
 import Board
@@ -40,7 +40,7 @@ prop_visibleNearPlayerShip b playerId =
     ( \o ->
         alwaysVisible o
           || ( playerShips /= []
-                 && minimum (map (\ps -> distance (getPos ps) (getPos o)) playerShips) <= shipViewRadius
+                 && minimum (map (\ps -> distance (position ps) (position o)) playerShips) <= shipViewRadius
              )
     )
     (filterVisible b playerId)
