@@ -79,10 +79,11 @@ validMove b playerId (Thrust idNum vec) =
     ship = findId idNum b
 validMove b playerId Attack {attacker, target} =
   case attackerShip of
-    Just Ship {owner, weaponDamage} ->
+    Just Ship {owner, weaponDamage, isDefensive} ->
       owner == playerId
         && weaponDamage == 0
         && attacker /= target
+        && not isDefensive
         && validTarget
     _ -> False
   where
