@@ -62,14 +62,13 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
         ml <- readIORef moveList
         writeIORef moveList (moves : ml)
         if length moves == numPlayers
-          then
-            let updated = updateBoard (concat ml) board'
-             in do
-                  writeIORef board updated
-                  signalQSemN newBoardSem (numPlayers - 1)
-                  sendBoard s (filterVisible updated playerId)
-                  waitQSemN sentBoardSem (numPlayers - 1)
-                  Lock.release moveListLock
+          then do
+            updated <- updateBoard (concat ml) board'
+            writeIORef board updated
+            signalQSemN newBoardSem (numPlayers - 1)
+            sendBoard s (filterVisible updated playerId)
+            waitQSemN sentBoardSem (numPlayers - 1)
+            Lock.release moveListLock
           else do
             Lock.release moveListLock
             waitQSemN newBoardSem 1

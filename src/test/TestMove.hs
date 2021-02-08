@@ -23,8 +23,7 @@ import qualified Data.ByteString.Char8 as B
 import Move
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2
-import Test.QuickCheck
-import TestUtils
+import TestUtils ()
 
 group :: Test
 group =

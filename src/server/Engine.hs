@@ -21,25 +21,42 @@ module Engine where
 
 import Balance
 import Board
+import Control.Monad
 import Move
 import Util
 
 --- updates a board given a list of validated moves
-updateBoard :: [Move] -> Board -> Board
-updateBoard ml = postOrderTick . resolveOrders ml . preOrderTick
+updateBoard :: [Move] -> Board -> IO Board
+updateBoard ml b = postOrderTick <$> resolveOrders ml (preOrderTick b)
 
 --- updates the board before the orders phase
 preOrderTick :: Board -> Board
 preOrderTick b = b -- TODO
 
 --- resolves a list of orders
-resolveOrders :: [Move] -> Board -> Board
-resolveOrders ml b = foldr resolveOrder b ml
+resolveOrders :: [Move] -> Board -> IO Board
+resolveOrders ml b = foldM resolveOrder b ml
 
 --- resolves an order
-resolveOrder :: Move -> Board -> Board
-resolveOrder Thrust {Move.idNum = idNum', dv = dv'} b = map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b
-resolveOrder Attack {attacker, target} b = b -- TODO
+resolveOrder :: Board -> Move -> IO Board
+resolveOrder b Thrust {Move.idNum = idNum', dv = dv'} = return (map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b)
+resolveOrder b Attack {attacker, target} = mapM resolveAttack b
+  where
+    attacker' = case findId attacker b of
+      Just attacker' -> attacker'
+      Nothing -> error "invalid attack order being resolved"
+    resolveAttack e =
+      if Board.idNum e == target
+        then do
+          damage <- resolveCombat attacker' e
+          return (doDamage damage e)
+        else return e
+
+--- resolves a single combat
+resolveCombat :: Entity -> Entity -> IO (Int, Int, Int)
+resolveCombat attacker target = do
+  hits <- rollHits (oddsRatio (strength attacker) (strength target))
+  rollDamage hits
 
 --- updates the board after the orders phase
 postOrderTick :: Board -> Board

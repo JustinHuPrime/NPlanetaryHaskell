@@ -31,7 +31,8 @@ executable nplanetary-server
     base >= 4.13 && < 4.14,
     network >= 3.1.2 && < 3.2,
     bytestring >= 0.10.10 && < 0.11,
-    concurrent-extra >= 0.7.0 && < 0.8
+    concurrent-extra >= 0.7.0 && < 0.8,
+    random >= 1.0 && < 1.2
   hs-source-dirs:      src/server src/common
   default-language:    Haskell2010
   ghc-options:         -Wall -Wno-name-shadowing
@@ -47,7 +48,8 @@ executable nplanetary-client
     OpenGL >= 3.0.3 && < 3.1,
     GLUT >= 2.7.0 && < 2.8,
     bytestring >= 0.10.10 && < 0.11,
-    concurrent-extra >= 0.7.0 && < 0.8
+    concurrent-extra >= 0.7.0 && < 0.8,
+    random >= 1.0 && < 1.2
   hs-source-dirs:      src/client src/common
   default-language:    Haskell2010
   ghc-options:         -Wall -Wno-name-shadowing
@@ -61,6 +63,7 @@ Test-Suite test
   build-depends:
     base >= 4.13 && < 4.14,
     bytestring >= 0.10.10 && < 0.11,
+    random >= 1.0 && < 1.2,
     test-framework,
     test-framework-hunit,
     test-framework-quickcheck2,

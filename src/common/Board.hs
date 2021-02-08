@@ -77,6 +77,15 @@ isShip :: Entity -> Bool
 isShip Ship {} = True
 isShip _ = False
 
+doDamage :: (Int, Int, Int) -> Entity -> Entity
+doDamage (toWeapon, toDrive, toStructure) ship@Ship {weaponDamage, driveDamage, structureDamage} =
+  ship
+    { weaponDamage = weaponDamage + toWeapon,
+      driveDamage = driveDamage + toDrive,
+      structureDamage = structureDamage + toStructure
+    }
+doDamage _ _ = error "Damage applied to a non-ship!"
+
 --- is this entity always visible?
 alwaysVisible :: Entity -> Bool
 alwaysVisible AstroObj {} = True
