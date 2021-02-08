@@ -80,9 +80,9 @@ isShip _ = False
 doDamage :: (Int, Int, Int) -> Entity -> Entity
 doDamage (toWeapon, toDrive, toStructure) ship@Ship {weaponDamage, driveDamage, structureDamage} =
   ship
-    { weaponDamage = weaponDamage + toWeapon,
-      driveDamage = driveDamage + toDrive,
-      structureDamage = structureDamage + toStructure
+    { weaponDamage = min (weaponDamage + toWeapon) 6,
+      driveDamage = min (driveDamage + toDrive) 6,
+      structureDamage = min (structureDamage + toStructure) 6
     }
 doDamage _ _ = error "Damage applied to a non-ship!"
 
