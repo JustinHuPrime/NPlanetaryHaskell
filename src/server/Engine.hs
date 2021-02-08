@@ -31,7 +31,18 @@ updateBoard ml b = postOrderTick <$> resolveOrders ml (preOrderTick b)
 
 --- updates the board before the orders phase
 preOrderTick :: Board -> Board
-preOrderTick b = b -- TODO
+preOrderTick = map preOrderTickOne
+  where
+    preOrderTickOne :: Entity -> Entity
+    preOrderTickOne ship@Ship {weaponDamage, driveDamage, structureDamage} =
+      ship
+        { weaponDamage = if weaponDamage == 6 then 6 else max (weaponDamage - 1) 0,
+          driveDamage = if driveDamage == 6 then 6 else max (driveDamage - 1) 0,
+          structureDamage = if structureDamage == 6 then 6 else max (structureDamage - 1) 0
+        }
+    preOrderTickOne other = other
+
+-- reduce damage of things by one
 
 --- resolves a list of orders
 resolveOrders :: [Move] -> Board -> IO Board
@@ -60,7 +71,19 @@ resolveCombat attacker target = do
 
 --- updates the board after the orders phase
 postOrderTick :: Board -> Board
-postOrderTick b = b -- TODO
+postOrderTick b = map postOrderTickOne (filter (not . destroyed) b)
+  where
+    destroyed :: Entity -> Bool
+    destroyed Ship {structureDamage} = structureDamage == 6
+    destroyed _ = False
+
+    postOrderTickOne :: Entity -> Entity
+    postOrderTickOne ship@Ship {position, velocity} =
+      ship
+        { position = position `vecAdd` velocity,
+          velocity = velocity `vecAdd` gravityAt b position
+        }
+    postOrderTickOne other = other
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]

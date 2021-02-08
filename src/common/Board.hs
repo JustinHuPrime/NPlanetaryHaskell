@@ -86,6 +86,14 @@ doDamage (toWeapon, toDrive, toStructure) ship@Ship {weaponDamage, driveDamage, 
     }
 doDamage _ _ = error "Damage applied to a non-ship!"
 
+--- computes the acceleration vector due to gravity at a given position
+--- uses inverse-linear gravity (a = M/r)
+gravityAt :: Board -> Vec2 -> Vec2
+gravityAt b shipPos = foldr (vecAdd . gravityFrom) (0, 0) b
+  where
+    gravityFrom AstroObj {position, mass} = magnitude (position `vecMinus` shipPos) `vecDiv` (mass `vecTimes` vecUnit (position `vecMinus` shipPos))
+    gravityFrom _ = (0, 0)
+
 --- is this entity always visible?
 alwaysVisible :: Entity -> Bool
 alwaysVisible AstroObj {} = True
