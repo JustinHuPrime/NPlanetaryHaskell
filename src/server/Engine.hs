@@ -38,8 +38,8 @@ resolveOrders ml b = foldr resolveOrder b ml
 
 --- resolves an order
 resolveOrder :: Move -> Board -> Board
-resolveOrder (Thrust idNum' dv') b = map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b
-resolveOrder (Attack attacker defender) b = b -- TODO
+resolveOrder Thrust {Move.idNum = idNum', dv = dv'} b = map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b
+resolveOrder Attack {attacker, target} b = b -- TODO
 
 --- updates the board after the orders phase
 postOrderTick :: Board -> Board
@@ -52,7 +52,7 @@ validateMoves b playerId = filter (validMove b playerId)
 validMove :: Board -> Int -> Move -> Bool
 validMove b playerId (Thrust idNum vec) =
   case ship of
-    Just (Ship _ _ _ owner _ _ _ _ fuel _ driveDamage _) ->
+    Just Ship {owner, fuel, driveDamage} ->
       owner == playerId
         && driveDamage == 0
         && magnitude vec <= 1
@@ -60,9 +60,9 @@ validMove b playerId (Thrust idNum vec) =
     _ -> False
   where
     ship = findId idNum b
-validMove b playerId (Attack attacker target) =
+validMove b playerId Attack {attacker, target} =
   case attackerShip of
-    Just (Ship _ _ _ owner _ _ _ _ _ weaponDamage _ _) ->
+    Just Ship {owner, weaponDamage} ->
       owner == playerId
         && weaponDamage == 0
         && attacker /= target

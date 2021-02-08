@@ -30,5 +30,4 @@ readBoard s = parseBoard <$> readPacket s
 
 --- sends a list of moves down the socket
 sendMoves :: Socket -> [Move] -> IO ()
-sendMoves s ml = do
-  sendAll s (serializeMoveList ml)
+sendMoves s ml = sendAll s (serializeMoveList ml)
