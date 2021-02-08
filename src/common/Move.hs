@@ -15,6 +15,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Move where
 
@@ -25,9 +26,9 @@ import Util
 
 data Move
   = --- thust the ship with given id the given amount
-    Thrust Int Vec2
+    Thrust {idNum :: Int, dv :: Vec2}
   | --- launch a mine from the given ship
-    Attack Int Int
+    Attack {attacker :: Int, target :: Int}
   deriving (Show, Eq)
 
 --- serializes a list of moves into a list of serialized moves separated by file separators and terminated by an end-of-transmission byte

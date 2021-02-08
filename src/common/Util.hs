@@ -25,3 +25,6 @@ magnitude (x, y) = sqrt (x ** 2 + y ** 2)
 
 distance :: Vec2 -> Vec2 -> Double
 distance (ax, ay) (bx, by) = magnitude (ax - bx, ay - by)
+
+vecAdd :: Vec2 -> Vec2 -> Vec2
+vecAdd (ax, ay) (bx, by) = (ax + bx, ay + by)

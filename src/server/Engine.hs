@@ -15,6 +15,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Engine where
 
@@ -37,7 +38,7 @@ resolveOrders ml b = foldr resolveOrder b ml
 
 --- resolves an order
 resolveOrder :: Move -> Board -> Board
-resolveOrder (Thrust idNum vec) b = b -- TODO
+resolveOrder (Thrust idNum' dv') b = map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b
 resolveOrder (Attack attacker defender) b = b -- TODO
 
 --- updates the board after the orders phase
@@ -84,7 +85,7 @@ filterVisible b playerId =
     ( \o ->
         alwaysVisible o
           || ( playerShips /= []
-                 && minimum (map (\ps -> distance (getPos ps) (getPos o)) playerShips) <= shipViewRadius
+                 && minimum (map (\ps -> distance (position ps) (position o)) playerShips) <= shipViewRadius
              )
     )
     b
