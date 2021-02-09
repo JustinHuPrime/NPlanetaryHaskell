@@ -52,7 +52,7 @@ handler :: Socket -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Loc
 handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers playerId = do
   -- send out initial board state
   initBoard <- readIORef board
-  sendBoard s initBoard
+  sendBoard s (filterVisible initBoard playerId)
   forever
     ( do
         -- get list of moves
@@ -67,14 +67,14 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
              in do
                   writeIORef board updated
                   signalQSemN newBoardSem (numPlayers - 1)
-                  sendBoard s updated
+                  sendBoard s (filterVisible updated playerId)
                   waitQSemN sentBoardSem (numPlayers - 1)
                   Lock.release moveListLock
           else do
             Lock.release moveListLock
             waitQSemN newBoardSem 1
             updated <- readIORef board
-            sendBoard s updated
+            sendBoard s (filterVisible updated playerId)
             signalQSemN sentBoardSem 1
     )
 
@@ -123,11 +123,8 @@ main = do
       exitWith (ExitFailure 1)
     else case (readMaybe (head args) :: Maybe Int) of
       Just numPlayers
-        | numPlayers <= 1 -> do
-          putStrLn "Number of players must be at least two"
-          exitWith (ExitFailure 1)
-        | numPlayers > 4 -> do
-          putStrLn "Number of players must be less than four"
+        | numPlayers /= 2 -> do
+          putStrLn "Number of players must be exactly two"
           exitWith (ExitFailure 1)
         | otherwise -> do
           putStrLn "N-Planetary server version 0.1.0"
