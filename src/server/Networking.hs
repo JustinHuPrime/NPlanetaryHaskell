@@ -16,13 +16,20 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Move where
+module Networking where
 
-import Util
+import Board
+import Move
+import Network.Socket
 
-data Move
-  = --- thust the ship with given id the given amount
-    Thrust Int Vec2
-  | --- have the first ship attack the second entity (currently must be a ship)
-    Attack Int Int
-  deriving (Show)
+--- sends a board down the socket
+sendBoard :: Socket -> Board -> IO ()
+sendBoard s b = do
+  -- TODO: implement this
+  return ()
+
+--- reads the list of moves from the client
+readMoves :: Socket -> IO [Move]
+readMoves s = do
+  -- TODO: implement this
+  return []

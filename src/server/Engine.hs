@@ -16,13 +16,19 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Move where
+module Engine where
 
-import Util
+import Board
+import Move
 
-data Move
-  = --- thust the ship with given id the given amount
-    Thrust Int Vec2
-  | --- have the first ship attack the second entity (currently must be a ship)
-    Attack Int Int
-  deriving (Show)
+--- updates a board given a list of validated moves
+updateBoard :: Board -> [[Move]] -> Board
+updateBoard b ml = b -- TODO
+
+--- filters out invalid moves
+validateMoves :: Board -> Int -> [Move] -> [Move]
+validateMoves b playerId ml = ml -- TODO
+
+--- filters out entities not visible to a player
+filterVisible :: Board -> Int -> Board
+filterVisible b playerId = b -- TODO

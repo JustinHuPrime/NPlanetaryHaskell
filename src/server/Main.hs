@@ -23,41 +23,80 @@ import Control.Concurrent
 import qualified Control.Concurrent.Lock as Lock
 import qualified Control.Exception as E
 import Control.Monad
-import qualified Data.ByteString.Char8 as C
 import Data.IORef
+import Engine
 import Move
 import NetInterface
 import Network.Socket
-import Network.Socket.ByteString
+import Networking
 import System.Environment
 import System.Exit
 import Text.Read
 
-handler :: Socket -> IORef Board -> IORef [Move] -> Lock.Lock -> IO ()
-handler s board moveList lock = do
-  msg <- recv s 1024
-  sendAll s msg
-  C.putStrLn msg
-  _ <- recv s 1024
-  return ()
+{-
+Concurrency system:
+A thread reads moves, and filters out the bad ones
+It then locks the moveListLock, and adds the moves to the list
+If the list is less than `numPlayers` long:
+  releases the moveListLock and downs the newBoardSem by one - this thread is not the leader this time around
+  once the wait is done, it sends out the new board state and ups on the sentBoardSem
+  repeat.
+If the list is `numPlayers` long:
+  it processes the moves in the list and saves the new board
+  it ups the newBoardSem by `numPlayers` - 1, and it sends out the new board state
+  it downs the sentBoardSem by `numPlayers` - 1, and it releases the moveListLock
+  repeat.
+-}
 
-loop :: Int -> IORef Board -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
-loop 1 board moveList lock s = do
+handler :: Socket -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Int -> Int -> IO ()
+handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers playerId = do
+  -- send out initial board state
+  initBoard <- readIORef board
+  sendBoard s (filterVisible initBoard playerId)
+  forever
+    ( do
+        -- get list of moves
+        b <- readIORef board
+        moves <- validateMoves b playerId <$> readMoves s
+        Lock.acquire moveListLock
+        ml <- readIORef moveList
+        writeIORef moveList (moves : ml)
+        if length moves == numPlayers
+          then
+            let updated = updateBoard b ml
+             in do
+                  writeIORef board updated
+                  signalQSemN newBoardSem (numPlayers - 1)
+                  sendBoard s (filterVisible updated playerId)
+                  waitQSemN sentBoardSem (numPlayers - 1)
+                  Lock.release moveListLock
+          else do
+            Lock.release moveListLock
+            waitQSemN newBoardSem 1
+            updated <- readIORef board
+            sendBoard s (filterVisible updated playerId)
+            signalQSemN sentBoardSem 1
+    )
+
+acceptConns :: Int -> Int -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Socket -> IO ()
+acceptConns 1 numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
   (conn, _) <- accept s
-  handler conn board moveList lock
+  handler conn board newBoardSem sentBoardSem moveList moveListLock numPlayers 1
   gracefulClose conn 5000
-loop numPlayers board moveList lock s = do
+acceptConns currentPlayer numPlayers board newBoardSem sentBoardSem moveList moveListLock s = do
   (conn, _) <- accept s
-  void (forkFinally (handler conn board moveList lock) (const (gracefulClose conn 5000)))
-  loop (numPlayers - 1) board moveList lock s
+  void (forkFinally (handler conn board newBoardSem sentBoardSem moveList moveListLock numPlayers currentPlayer) (const (gracefulClose conn 5000)))
+  acceptConns (currentPlayer - 1) numPlayers board newBoardSem sentBoardSem moveList moveListLock s
 
 server :: Int -> IO ()
 server numPlayers = do
   board <- newIORef [] :: IO (IORef Board)
-  moveList <- newIORef [] :: IO (IORef [Move])
-  lock <- Lock.new
+  newBoardSem <- newQSemN 0
+  sentBoardSem <- newQSemN 0
+  moveList <- newIORef [] :: IO (IORef [[Move]])
+  moveListLock <- Lock.new
   addr <- resolve
-  E.bracket (open addr) close (loop numPlayers board moveList lock)
+  E.bracket (open addr) close (acceptConns numPlayers numPlayers board newBoardSem sentBoardSem moveList moveListLock)
   exitSuccess
   where
     resolve =

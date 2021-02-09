@@ -6,10 +6,70 @@ cradle:
     - path: "src/common/Main.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
+    - path: "src/server/Engine.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/Networking.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/Balance.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/Board.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/Move.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/NetInterface.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/server/Util.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Engine.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Networking.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Balance.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Board.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Move.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/NetInterface.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Util.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
     - path: "src/client/Main.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/common/Main.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/client/Board.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/client/Move.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/client/NetInterface.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/Board.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/Move.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/NetInterface.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client"
