@@ -27,7 +27,7 @@ import Util
 data Move
   = --- thust the ship with given id the given amount
     Thrust {idNum :: Int, dv :: Vec2}
-  | --- launch a mine from the given ship
+  | --- have the first ship attack the second entity (currently must be a ship)
     Attack {attacker :: Int, target :: Int}
   deriving (Show, Eq)
 
