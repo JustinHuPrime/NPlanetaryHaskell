@@ -25,7 +25,15 @@ source-repository head
 
 executable nplanetary-server
   main-is:             Main.hs
-  other-modules:       Engine, Networking, Balance, Board, Move, NetInterface, Util, Serializing
+  other-modules:       
+    Engine,
+    Networking,
+    Balance,
+    Board,
+    Move,
+    NetInterface,
+    Util,
+    Serializing
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -40,7 +48,14 @@ executable nplanetary-server
 
 executable nplanetary-client
   main-is:             Main.hs
-  other-modules:       Board, Move, NetInterface, Networking, UI, Util, Serializing
+  other-modules:       
+    Board,
+    Move,
+    NetInterface,
+    Networking,
+    UI,
+    Util,
+    Serializing
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
@@ -58,7 +73,19 @@ executable nplanetary-client
 Test-Suite test
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  other-modules:       TestBoard, Board, Util, Serializing, TestMove, Move, TestUtils, Engine, TestOrderValidator, Balance, TestFilterVisible
+  other-modules:       
+    TestBoard,
+    Board,
+    Util,
+    Serializing,
+    TestMove,
+    Move,
+    TestUtils,
+    Engine,
+    TestOrderValidator,
+    Balance,
+    TestFilterVisible,
+    TestMoveResolver
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,

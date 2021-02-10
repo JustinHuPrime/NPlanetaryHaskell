@@ -48,12 +48,16 @@ group =
           testCase "attack rejects nonexistent target" test_attackRejectsNonExistentTarget,
           testCase "attack rejects non-ship target" test_attackRejectsNonShipTarget,
           testCase "attack rejects self-target" test_attackRejectsSelfTarget,
+          testCase "attack rejects defensive strength" test_attackRejectsDefensiveStrength,
           testCase "attack accepts in other cases" test_attackAcceptsOtherCases
         ]
     ]
 
 test_attackAcceptsOtherCases :: Assertion
-test_attackAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= True
+test_attackAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 False 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= True
+
+test_attackRejectsDefensiveStrength :: Assertion
+test_attackRejectsDefensiveStrength = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= False
 
 test_attackRejectsSelfTarget :: Assertion
 test_attackRejectsSelfTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 1) @?= False
