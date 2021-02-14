@@ -36,9 +36,9 @@ preOrderTick = map preOrderTickOne
     preOrderTickOne :: Entity -> Entity
     preOrderTickOne ship@Ship {weaponDamage, driveDamage, structureDamage} =
       ship
-        { weaponDamage = if weaponDamage == 6 then 6 else max (weaponDamage - 1) 0,
-          driveDamage = if driveDamage == 6 then 6 else max (driveDamage - 1) 0,
-          structureDamage = if structureDamage == 6 then 6 else max (structureDamage - 1) 0
+        { weaponDamage = if weaponDamage == maxDamage then maxDamage else max (weaponDamage - 1) 0,
+          driveDamage = if driveDamage == maxDamage then maxDamage else max (driveDamage - 1) 0,
+          structureDamage = if structureDamage == maxDamage then maxDamage else max (structureDamage - 1) 0
         }
     preOrderTickOne other = other
 
@@ -74,7 +74,7 @@ postOrderTick :: Board -> Board
 postOrderTick b = map postOrderTickOne (filter (not . destroyed) b)
   where
     destroyed :: Entity -> Bool
-    destroyed Ship {structureDamage} = structureDamage == 6
+    destroyed Ship {structureDamage} = structureDamage == maxDamage
     destroyed _ = False
 
     postOrderTickOne :: Entity -> Entity
