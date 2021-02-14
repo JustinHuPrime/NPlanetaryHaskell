@@ -15,7 +15,7 @@ maintainer:          justin.hu@alumni.ubc.ca
 copyright:           2020 Justin Hu
 category:            games
 build-type:          Simple
-extra-source-files:  README.md
+extra-source-files:  README.md CHANGELOG.md
 
 
 source-repository head
