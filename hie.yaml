@@ -27,6 +27,9 @@ cradle:
     - path: "src/server/Util.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
+    - path: "src/server/Serializing.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
     - path: "src/common/Engine.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
@@ -46,6 +49,9 @@ cradle:
       component: "NPlanetary:exe:nplanetary-server"
 
     - path: "src/common/Util.hs"
+      component: "NPlanetary:exe:nplanetary-server"
+
+    - path: "src/common/Serializing.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
     - path: "src/client/Main.hs"
@@ -72,6 +78,9 @@ cradle:
     - path: "src/client/Util.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
+    - path: "src/client/Serializing.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
     - path: "src/common/Board.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
@@ -88,6 +97,9 @@ cradle:
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/common/Util.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/common/Serializing.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client"

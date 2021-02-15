@@ -16,19 +16,13 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Networking where
+module TestUtils where
 
-import Board
-import Move
-import NetInterface
-import Network.Socket
-import Network.Socket.ByteString
+import Data.Char
+import Serializing
 
---- reads a board from the server
-readBoard :: Socket -> IO Board
-readBoard s = parseBoard <$> readPacket s
+limitPrecision :: RealFrac a => a -> Double
+limitPrecision x = fromIntegral (round x :: Int) / fixedPointPrecision
 
---- sends a list of moves down the socket
-sendMoves :: Socket -> [Move] -> IO ()
-sendMoves s ml = do
-  sendAll s (serializeMoveList ml)
+forceAscii :: String -> String
+forceAscii = filter (\c -> 32 <= ord c && ord c <= 126)
