@@ -30,8 +30,8 @@ executable nplanetary-server
   build-depends:
     base >= 4.13 && < 4.14,
     network >= 3.1.2 && < 3.2,
-    bytestring,
-    concurrent-extra
+    bytestring >= 0.10.10 && < 0.11,
+    concurrent-extra >= 0.7.0 && < 0.8
   hs-source-dirs:      src/server src/common
   default-language:    Haskell2010
   ghc-options:         -Wall
@@ -45,9 +45,9 @@ executable nplanetary-client
     base >= 4.13 && < 4.14,
     network >= 3.1.2 && < 3.2,
     OpenGL >= 3.0.3 && < 3.1,
-    GLUT,
-    bytestring,
-    concurrent-extra
+    GLUT >= 2.7.0 && < 2.8,
+    bytestring >= 0.10.10 && < 0.11,
+    concurrent-extra >= 0.7.0 && < 0.8
   hs-source-dirs:      src/client src/common
   default-language:    Haskell2010
   ghc-options:         -Wall
@@ -56,10 +56,11 @@ executable nplanetary-client
 Test-Suite test
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  other-modules:       
+  other-modules:       TestBoard Board Util
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
+    bytestring >= 0.10.10 && < 0.11,
     test-framework,
     test-framework-hunit,
     test-framework-quickcheck2,

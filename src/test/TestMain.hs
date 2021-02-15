@@ -16,12 +16,25 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Main (main) where
+module Main where
 
-import Test.HUnit
+import Test.Framework
+import qualified TestBoard
 
-tests :: Test
-tests = TestList []
+tests :: [Test]
+tests = [TestBoard.group]
 
-main :: IO Counts
-main = runTestTT tests
+main :: IO ()
+main = defaultMain tests
+
+mainWithOpts :: IO ()
+mainWithOpts = do
+  let my_test_opts =
+        (mempty :: TestOptions)
+          { topt_maximum_generated_tests = Just 500
+          }
+  let my_runner_opts =
+        (mempty :: RunnerOptions)
+          { ropt_test_options = Just my_test_opts
+          }
+  defaultMainWithOpts tests my_runner_opts

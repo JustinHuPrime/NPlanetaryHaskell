@@ -21,12 +21,11 @@ module Networking where
 import Board
 import Move
 import Network.Socket
+import Network.Socket.ByteString
 
 --- sends a board down the socket
 sendBoard :: Socket -> Board -> IO ()
-sendBoard s b = do
-  -- TODO: implement this
-  return ()
+sendBoard s b = sendAll s (serializeBoard b)
 
 --- reads the list of moves from the client
 readMoves :: Socket -> IO [Move]
