@@ -33,6 +33,18 @@ distance (ax, ay) (bx, by) = magnitude (ax - bx, ay - by)
 vecAdd :: Vec2 -> Vec2 -> Vec2
 vecAdd (ax, ay) (bx, by) = (ax + bx, ay + by)
 
+vecMinus :: Vec2 -> Vec2 -> Vec2
+vecMinus (ax, ay) (bx, by) = (ax - bx, ay - by)
+
+vecTimes :: Double -> Vec2 -> Vec2
+vecTimes f (x, y) = (f * x, f * y)
+
+vecDiv :: Double -> Vec2 -> Vec2
+vecDiv f (x, y) = (x / f, y / f)
+
+vecUnit :: Vec2 -> Vec2
+vecUnit v = magnitude v `vecDiv` v
+
 vec3iAdd :: Vec3i -> Vec3i -> Vec3i
 vec3iAdd (ax, ay, az) (bx, by, bz) = (ax + bx, ay + by, az + bz)
 
