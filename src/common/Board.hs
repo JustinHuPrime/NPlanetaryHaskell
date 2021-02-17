@@ -52,12 +52,28 @@ getEntityId (AstroObj idNum _ _ _ _) = idNum
 getEntityId (AsteroidCluster idNum _) = idNum
 getEntityId (Ship idNum _ _ _ _ _ _ _ _ _ _ _) = idNum
 
+getPos :: Entity -> Vec2
+getPos (AstroObj _ pos _ _ _) = pos
+getPos (AsteroidCluster _ pos) = pos
+getPos (Ship _ pos _ _ _ _ _ _ _ _ _ _) = pos
+
 findId :: Int -> Board -> Maybe Entity
 findId idNum = find (\e -> idNum == getEntityId e)
 
 isShip :: Entity -> Bool
 isShip Ship {} = True
 isShip _ = False
+
+--- is this entity always visible?
+alwaysVisible :: Entity -> Bool
+alwaysVisible AstroObj {} = True
+alwaysVisible AsteroidCluster {} = True
+alwaysVisible _ = False
+
+--- is ship owned by given player
+isPlayerShip :: Int -> Entity -> Bool
+isPlayerShip playerId (Ship _ _ _ owner _ _ _ _ _ _ _ _) = playerId == owner
+isPlayerShip _ _ = False
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
 serializeBoard :: Board -> B.ByteString

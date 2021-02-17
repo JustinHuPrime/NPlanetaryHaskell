@@ -15,25 +15,34 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 module TestBoard where
 
+import Balance
 import Board
-import qualified Data.ByteString.Char8 as B
+import Engine
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import TestUtils ()
+import Util
 
 group :: Test
 group =
   testGroup
-    "board serializer tests"
-    [ testProperty "ends with EOT" prop_endsWithEOT,
-      testProperty "round trip" prop_roundTrip
+    "filter visible tests"
+    [ testProperty "visible ships are always near player ships" prop_visibleNearPlayerShip
     ]
 
-prop_endsWithEOT :: Board -> Bool
-prop_endsWithEOT b = B.last (serializeBoard b) == '\x03'
-
-prop_roundTrip :: Board -> Bool
-prop_roundTrip b = b == parseBoard (B.init (serializeBoard b))
+prop_visibleNearPlayerShip :: Board -> Int -> Bool
+prop_visibleNearPlayerShip b playerId =
+  all
+    ( \o ->
+        alwaysVisible o
+          || ( playerShips /= []
+                 && minimum (map (\ps -> distance (getPos ps) (getPos o)) playerShips) <= shipViewRadius
+             )
+    )
+    (filterVisible b playerId)
+  where
+    playerShips = filter (isPlayerShip playerId) b

@@ -18,6 +18,7 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Engine where
 
+import Balance
 import Board
 import Move
 import Util
@@ -61,4 +62,14 @@ validMove b playerId (Attack attacker target) =
 
 --- filters out entities not visible to a player
 filterVisible :: Board -> Int -> Board
-filterVisible b playerId = b -- TODO
+filterVisible b playerId =
+  filter
+    ( \o ->
+        alwaysVisible o
+          || ( playerShips /= []
+                 && minimum (map (\ps -> distance (getPos ps) (getPos o)) playerShips) <= shipViewRadius
+             )
+    )
+    b
+  where
+    playerShips = filter (isPlayerShip playerId) b

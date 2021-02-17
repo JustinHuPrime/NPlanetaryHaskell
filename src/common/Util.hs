@@ -22,3 +22,6 @@ type Vec2 = (Double, Double)
 
 magnitude :: Vec2 -> Double
 magnitude (x, y) = sqrt (x ** 2 + y ** 2)
+
+distance :: Vec2 -> Vec2 -> Double
+distance (ax, ay) (bx, by) = magnitude (ax - bx, ay - by)
