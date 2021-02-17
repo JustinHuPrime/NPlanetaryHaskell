@@ -20,6 +20,7 @@ module Engine where
 
 import Board
 import Move
+import Util
 
 --- updates a board given a list of validated moves
 updateBoard :: Board -> [[Move]] -> Board
@@ -27,7 +28,36 @@ updateBoard b ml = b -- TODO
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
-validateMoves b playerId ml = ml -- TODO
+validateMoves b playerId = filter (validMove b playerId)
+
+validMove :: Board -> Int -> Move -> Bool
+validMove b playerId (Thrust idNum vec) =
+  case ship of
+    Just (Ship _ _ _ owner _ _ _ _ fuel _ driveDamage _) ->
+      owner == playerId
+        && driveDamage == 0
+        && magnitude vec <= 1
+        && magnitude vec <= fuel
+    _ -> False
+  where
+    ship = findId idNum b
+validMove b playerId (Attack attacker target) =
+  case attackerShip of
+    Just (Ship _ _ _ owner _ _ _ _ _ weaponDamage _ _) ->
+      owner == playerId
+        && weaponDamage == 0
+        && attacker /= target
+        && validTarget
+    _ -> False
+  where
+    attackerShip = findId attacker b
+    validTarget =
+      case targetShip of
+        Just Ship {} ->
+          True
+        _ -> False
+      where
+        targetShip = findId target b
 
 --- filters out entities not visible to a player
 filterVisible :: Board -> Int -> Board

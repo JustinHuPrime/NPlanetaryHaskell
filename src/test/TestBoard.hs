@@ -54,10 +54,10 @@ instance Arbitrary Entity where
           isDefensive <- arbitrary
           fuelCap <- (arbitrary :: Gen Double)
           fuel <- (arbitrary :: Gen Double)
-          weaponHealth <- arbitrary
-          driveHealth <- arbitrary
-          structureHealth <- arbitrary
-          return (Ship idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy) owner (forceAscii name) strength isDefensive (limitPrecision fuelCap) (limitPrecision fuel) weaponHealth driveHealth structureHealth)
+          weaponDamage <- arbitrary
+          driveDamage <- arbitrary
+          structureDamage <- arbitrary
+          return (Ship idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy) owner (forceAscii name) strength isDefensive (limitPrecision fuelCap) (limitPrecision fuel) weaponDamage driveDamage structureDamage)
       ]
 
 group :: Test

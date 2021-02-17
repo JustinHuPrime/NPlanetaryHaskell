@@ -56,7 +56,7 @@ executable nplanetary-client
 Test-Suite test
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  other-modules:       TestBoard, Board, Util, Serializing, TestMove, Move, TestUtils
+  other-modules:       TestBoard, Board, Util, Serializing, TestMove, Move, TestUtils, Engine, TestOrderValidator, Balance
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,

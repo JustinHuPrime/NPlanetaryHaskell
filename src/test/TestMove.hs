@@ -22,7 +22,7 @@ module TestMove where
 import qualified Data.ByteString.Char8 as B
 import Move
 import Test.Framework
-import Test.Framework.Providers.QuickCheck2 (testProperty)
+import Test.Framework.Providers.QuickCheck2
 import Test.QuickCheck
 import TestUtils
 

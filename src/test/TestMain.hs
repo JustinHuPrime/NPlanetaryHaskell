@@ -20,9 +20,11 @@ module Main where
 
 import Test.Framework
 import qualified TestBoard
+import qualified TestMove
+import qualified TestOrderValidator
 
 tests :: [Test]
-tests = [TestBoard.group]
+tests = [TestBoard.group, TestMove.group, TestOrderValidator.group]
 
 main :: IO ()
 main = defaultMain tests
