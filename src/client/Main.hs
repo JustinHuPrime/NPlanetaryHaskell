@@ -32,8 +32,8 @@ import UI
 
 openWindow :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
 openWindow board boardLock moveList moveListLock s = do
-  initBoard <- readBoard s
-  writeIORef board initBoard
+  board' <- readBoard s
+  writeIORef board board'
 
   -- TODO: are there any additional options we need to pass?
   initialDisplayMode $= [DoubleBuffered]
@@ -62,9 +62,9 @@ client serverAddr = do
     resolve addr = do
       head <$> getAddrInfo (Just (defaultHints {addrSocketType = Stream})) (Just addr) (Just port)
     open addr = do
-      sock <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
-      connect sock (addrAddress addr)
-      return sock
+      s <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
+      connect s (addrAddress addr)
+      return s
 
 main :: IO ()
 main = do
@@ -76,8 +76,3 @@ main = do
     else do
       putStrLn "N-Planetary client version 0.1.0"
       client (head args)
-
--- get arguments, expecting one and only arg to be server address
--- connect to server, get world state
--- open gui window, display world state, on mouse, change world state (!), eventually send world state
--- get world state, repeat previous

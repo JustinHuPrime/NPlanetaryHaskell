@@ -16,18 +16,23 @@ You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
 
-module Networking where
+module TestMoveResolver where
 
 import Board
+import Engine
 import Move
-import NetInterface
-import Network.Socket
-import Network.Socket.ByteString
+import Test.Framework
+import Test.Framework.Providers.HUnit
+import Test.HUnit hiding (Test)
 
---- reads a board from the server
-readBoard :: Socket -> IO Board
-readBoard s = parseBoard <$> readPacket s
-
---- sends a list of moves down the socket
-sendMoves :: Socket -> [Move] -> IO ()
-sendMoves s ml = sendAll s (serializeMoveList ml)
+group :: Test
+group =
+  testGroup
+    "move resolver tests"
+    [ testGroup
+        "thrust order tests"
+        [],
+      testGroup
+        "attack order tests"
+        []
+    ]

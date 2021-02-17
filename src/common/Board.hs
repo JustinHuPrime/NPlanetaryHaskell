@@ -15,6 +15,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Board where
 
@@ -28,9 +29,18 @@ type Board = [Entity]
 
 data Entity
   = --- Astronomical object with some id, some x, y position, some name, some mass, some radius (in natural units)
-    AstroObj Int Vec2 String Double Double
+    AstroObj
+      { idNum :: Int,
+        position :: Vec2,
+        name :: String,
+        mass :: Double,
+        radius :: Double
+      }
   | --- Asteroid cluster with some id, some x, y position
-    AsteroidCluster Int Vec2
+    AsteroidCluster
+      { idNum :: Int,
+        position :: Vec2
+      }
   | --- Ship with:
     ---  - some id
     ---  - some x, y position
@@ -44,25 +54,37 @@ data Entity
     ---  - Weapon damage
     ---  - Drive damage
     ---  - Structure damage
-    Ship Int Vec2 Vec2 Int String Int Bool Double Double Int Int Int
+    Ship
+      { idNum :: Int,
+        position :: Vec2,
+        velocity :: Vec2,
+        owner :: Int,
+        name :: String,
+        strength :: Int,
+        isDefensive :: Bool,
+        fuelCapacity :: Double,
+        fuel :: Double,
+        weaponDamage :: Int,
+        driveDamage :: Int,
+        structureDamage :: Int
+      }
   deriving (Show, Eq)
 
-getEntityId :: Entity -> Int
-getEntityId (AstroObj idNum _ _ _ _) = idNum
-getEntityId (AsteroidCluster idNum _) = idNum
-getEntityId (Ship idNum _ _ _ _ _ _ _ _ _ _ _) = idNum
-
-getPos :: Entity -> Vec2
-getPos (AstroObj _ pos _ _ _) = pos
-getPos (AsteroidCluster _ pos) = pos
-getPos (Ship _ pos _ _ _ _ _ _ _ _ _ _) = pos
-
 findId :: Int -> Board -> Maybe Entity
-findId idNum = find (\e -> idNum == getEntityId e)
+findId searchFor = find (\e -> searchFor == idNum e)
 
 isShip :: Entity -> Bool
 isShip Ship {} = True
 isShip _ = False
+
+doDamage :: (Int, Int, Int) -> Entity -> Entity
+doDamage (toWeapon, toDrive, toStructure) ship@Ship {weaponDamage, driveDamage, structureDamage} =
+  ship
+    { weaponDamage = min (weaponDamage + toWeapon) 6,
+      driveDamage = min (driveDamage + toDrive) 6,
+      structureDamage = min (structureDamage + toStructure) 6
+    }
+doDamage _ _ = error "Damage applied to a non-ship!"
 
 --- is this entity always visible?
 alwaysVisible :: Entity -> Bool
@@ -72,7 +94,7 @@ alwaysVisible _ = False
 
 --- is ship owned by given player
 isPlayerShip :: Int -> Entity -> Bool
-isPlayerShip playerId (Ship _ _ _ owner _ _ _ _ _ _ _ _) = playerId == owner
+isPlayerShip playerId Ship {owner} = playerId == owner
 isPlayerShip _ _ = False
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte

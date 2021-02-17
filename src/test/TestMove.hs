@@ -23,22 +23,7 @@ import qualified Data.ByteString.Char8 as B
 import Move
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2
-import Test.QuickCheck
-import TestUtils
-
-instance Arbitrary Move where
-  arbitrary =
-    oneof
-      [ do
-          idNum <- arbitrary
-          x <- (arbitrary :: Gen Double)
-          y <- (arbitrary :: Gen Double)
-          return (Thrust idNum (limitPrecision x, limitPrecision y)),
-        do
-          attacker <- arbitrary
-          target <- arbitrary
-          return (Attack attacker target)
-      ]
+import TestUtils ()
 
 group :: Test
 group =

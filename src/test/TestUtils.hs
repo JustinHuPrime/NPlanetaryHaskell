@@ -21,6 +21,7 @@ module TestUtils where
 
 import Board
 import Data.Char
+import Move
 import Serializing
 import Test.QuickCheck
 
@@ -64,4 +65,16 @@ instance Arbitrary Entity where
           return (Ship idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy) owner (forceAscii name) strength isDefensive (limitPrecision fuelCap) (limitPrecision fuel) weaponDamage driveDamage structureDamage)
       ]
 
--- TODO: make this generate more sensible data, e.g. non-silly owner numbers
+instance Arbitrary Move where
+  arbitrary =
+    oneof
+      [ do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          return (Thrust idNum (limitPrecision x, limitPrecision y)),
+        do
+          attacker <- arbitrary
+          target <- arbitrary
+          return (Attack attacker target)
+      ]

@@ -15,17 +15,52 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU Affero General Public License along
 with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 -}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Engine where
 
 import Balance
 import Board
+import Control.Monad
 import Move
 import Util
 
 --- updates a board given a list of validated moves
-updateBoard :: Board -> [[Move]] -> Board
-updateBoard b ml = b -- TODO
+updateBoard :: [Move] -> Board -> IO Board
+updateBoard ml b = postOrderTick <$> resolveOrders ml (preOrderTick b)
+
+--- updates the board before the orders phase
+preOrderTick :: Board -> Board
+preOrderTick b = b -- TODO
+
+--- resolves a list of orders
+resolveOrders :: [Move] -> Board -> IO Board
+resolveOrders ml b = foldM resolveOrder b ml
+
+--- resolves an order
+resolveOrder :: Board -> Move -> IO Board
+resolveOrder b Thrust {Move.idNum = idNum', dv = dv'} = return (map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b)
+resolveOrder b Attack {attacker, target} = mapM resolveAttack b
+  where
+    attacker' = case findId attacker b of
+      Just attacker' -> attacker'
+      Nothing -> error "invalid attack order being resolved"
+    resolveAttack e =
+      if Board.idNum e == target
+        then do
+          damage <- resolveCombat attacker' e
+          return (doDamage damage e)
+        else return e
+
+--- resolves a single combat
+resolveCombat :: Entity -> Entity -> IO (Int, Int, Int)
+resolveCombat attacker target = do
+  hits <- rollHits (oddsRatio (strength attacker) (strength target))
+  rollDamage hits
+
+--- updates the board after the orders phase
+postOrderTick :: Board -> Board
+postOrderTick b = b -- TODO
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
@@ -34,7 +69,7 @@ validateMoves b playerId = filter (validMove b playerId)
 validMove :: Board -> Int -> Move -> Bool
 validMove b playerId (Thrust idNum vec) =
   case ship of
-    Just (Ship _ _ _ owner _ _ _ _ fuel _ driveDamage _) ->
+    Just Ship {owner, fuel, driveDamage} ->
       owner == playerId
         && driveDamage == 0
         && magnitude vec <= 1
@@ -42,12 +77,13 @@ validMove b playerId (Thrust idNum vec) =
     _ -> False
   where
     ship = findId idNum b
-validMove b playerId (Attack attacker target) =
+validMove b playerId Attack {attacker, target} =
   case attackerShip of
-    Just (Ship _ _ _ owner _ _ _ _ _ weaponDamage _ _) ->
+    Just Ship {owner, weaponDamage, isDefensive} ->
       owner == playerId
         && weaponDamage == 0
         && attacker /= target
+        && not isDefensive
         && validTarget
     _ -> False
   where
@@ -67,7 +103,7 @@ filterVisible b playerId =
     ( \o ->
         alwaysVisible o
           || ( playerShips /= []
-                 && minimum (map (\ps -> distance (getPos ps) (getPos o)) playerShips) <= shipViewRadius
+                 && minimum (map (\ps -> distance (position ps) (position o)) playerShips) <= shipViewRadius
              )
     )
     b

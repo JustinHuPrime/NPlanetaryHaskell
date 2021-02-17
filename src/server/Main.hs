@@ -51,25 +51,24 @@ If the list is `numPlayers` long:
 handler :: Socket -> IORef Board -> QSemN -> QSemN -> IORef [[Move]] -> Lock.Lock -> Int -> Int -> IO ()
 handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers playerId = do
   -- send out initial board state
-  initBoard <- readIORef board
-  sendBoard s (filterVisible initBoard playerId)
+  board' <- readIORef board
+  sendBoard s (filterVisible board' playerId)
   forever
     ( do
         -- get list of moves
-        b <- readIORef board
-        moves <- validateMoves b playerId <$> readMoves s
+        board' <- readIORef board
+        moves <- validateMoves board' playerId <$> readMoves s
         Lock.acquire moveListLock
         ml <- readIORef moveList
         writeIORef moveList (moves : ml)
         if length moves == numPlayers
-          then
-            let updated = updateBoard b ml
-             in do
-                  writeIORef board updated
-                  signalQSemN newBoardSem (numPlayers - 1)
-                  sendBoard s (filterVisible updated playerId)
-                  waitQSemN sentBoardSem (numPlayers - 1)
-                  Lock.release moveListLock
+          then do
+            updated <- updateBoard (concat ml) board'
+            writeIORef board updated
+            signalQSemN newBoardSem (numPlayers - 1)
+            sendBoard s (filterVisible updated playerId)
+            waitQSemN sentBoardSem (numPlayers - 1)
+            Lock.release moveListLock
           else do
             Lock.release moveListLock
             waitQSemN newBoardSem 1
@@ -107,12 +106,12 @@ server numPlayers = do
               }
        in head <$> getAddrInfo (Just hints) Nothing (Just port)
     open addr = do
-      sock <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
-      setSocketOption sock ReuseAddr 1
-      withFdSocket sock setCloseOnExecIfNeeded
-      bind sock (addrAddress addr)
-      listen sock 1024
-      return sock
+      s <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
+      setSocketOption s ReuseAddr 1
+      withFdSocket s setCloseOnExecIfNeeded
+      bind s (addrAddress addr)
+      listen s 1024
+      return s
 
 main :: IO ()
 main = do
@@ -132,9 +131,3 @@ main = do
       Nothing -> do
         putStrLn "Could not parse the number of players"
         exitWith (ExitFailure 1)
-
--- get arguments, expecting one and only arg to be number of players
--- open server, initialize world state
--- when player connects, remember that and assign them a colour out of [Red, Green, Blue, Yellow]
--- wait for packet from all players
--- update world state, send update packet out

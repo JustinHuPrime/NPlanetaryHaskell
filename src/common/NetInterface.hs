@@ -29,7 +29,5 @@ readPacket :: Socket -> IO B.ByteString
 readPacket s = do
   str <- recv s 4096
   if '\x03' `B.elem` str
-    then do
-      return (B.takeWhile (/= '\x03') str)
-    else do
-      B.append str <$> readPacket s
+    then return (B.takeWhile (/= '\x03') str)
+    else B.append str <$> readPacket s
