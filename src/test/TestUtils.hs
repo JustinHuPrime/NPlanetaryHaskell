@@ -62,7 +62,45 @@ instance Arbitrary Entity where
           weaponDamage <- arbitrary
           driveDamage <- arbitrary
           structureDamage <- arbitrary
-          return (Ship idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy) owner (forceAscii name) strength isDefensive (limitPrecision fuelCap) (limitPrecision fuel) weaponDamage driveDamage structureDamage)
+          cargoCapacity <- arbitrary
+          isCivilian <- arbitrary
+          mineQty <- arbitrary
+          torpedoQty <- arbitrary
+          nukeQty <- arbitrary
+          scannerQty <- arbitrary
+          pmGrappleQty <- arbitrary
+          automatedMineQty <- arbitrary
+          robotGuardQty <- arbitrary
+          oreQty <- arbitrary
+          ctShardQty <- arbitrary
+          mcrQty <- arbitrary
+          return
+            ( Ship
+                idNum
+                (limitPrecision x, limitPrecision y)
+                (limitPrecision dx, limitPrecision dy)
+                owner
+                (forceAscii name)
+                strength
+                isDefensive
+                (limitPrecision fuelCap)
+                (limitPrecision fuel)
+                weaponDamage
+                driveDamage
+                structureDamage
+                cargoCapacity
+                isCivilian
+                mineQty
+                torpedoQty
+                nukeQty
+                scannerQty
+                pmGrappleQty
+                automatedMineQty
+                robotGuardQty
+                oreQty
+                ctShardQty
+                mcrQty
+            )
       ]
 
 instance Arbitrary Move where

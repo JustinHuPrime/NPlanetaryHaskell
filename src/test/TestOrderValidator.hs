@@ -54,31 +54,31 @@ group =
     ]
 
 test_attackAcceptsOtherCases :: Assertion
-test_attackAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 False 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= True
+test_attackAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 False 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= True
 
 test_attackRejectsDefensiveStrength :: Assertion
-test_attackRejectsDefensiveStrength = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= False
+test_attackRejectsDefensiveStrength = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= False
 
 test_attackRejectsSelfTarget :: Assertion
-test_attackRejectsSelfTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 1) @?= False
+test_attackRejectsSelfTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 1) @?= False
 
 test_attackRejectsNonShipTarget :: Assertion
-test_attackRejectsNonShipTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, AsteroidCluster 2 (0, 0)] 1 (Attack 1 3) @?= False
+test_attackRejectsNonShipTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, AsteroidCluster 2 (0, 0)] 1 (Attack 1 3) @?= False
 
 test_attackRejectsNonExistentTarget :: Assertion
-test_attackRejectsNonExistentTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 3) @?= False
+test_attackRejectsNonExistentTarget = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 3) @?= False
 
 test_attackRejectsDamaged :: Assertion
-test_attackRejectsDamaged = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 1 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= False
+test_attackRejectsDamaged = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 1 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= False
 
 test_attackRejectsNonOwned :: Assertion
-test_attackRejectsNonOwned = validMove [Ship 1 (0, 0) (0, 0) 2 "Ship1" 1 True 10 10 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0] 1 (Attack 1 2) @?= False
+test_attackRejectsNonOwned = validMove [Ship 1 (0, 0) (0, 0) 2 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0, Ship 2 (0, 0) (0, 0) 2 "Ship2" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= False
 
 test_attackRejectsNonShip :: Assertion
-test_attackRejectsNonShip = validMove [AsteroidCluster 1 (0, 0), Ship 2 (0, 0) (0, 0) 1 "Ship2" 1 True 10 5 0 0 0] 1 (Attack 1 2) @?= False
+test_attackRejectsNonShip = validMove [AsteroidCluster 1 (0, 0), Ship 2 (0, 0) (0, 0) 1 "Ship2" 1 True 10 5 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= False
 
 test_attackRejectsNonExistent :: Assertion
-test_attackRejectsNonExistent = validMove [Ship 2 (0, 0) (0, 0) 1 "Ship2" 1 True 10 5 0 0 0] 1 (Attack 1 2) @?= False
+test_attackRejectsNonExistent = validMove [Ship 2 (0, 0) (0, 0) 1 "Ship2" 1 True 10 5 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Attack 1 2) @?= False
 
 test_thrustRejectsNonExistent :: Assertion
 test_thrustRejectsNonExistent = validMove [] 1 (Thrust 1 (0, 1)) @?= False
@@ -87,16 +87,16 @@ test_thrustRejectsNonShip :: Assertion
 test_thrustRejectsNonShip = validMove [AsteroidCluster 1 (0, 0)] 1 (Thrust 1 (0, 1)) @?= False
 
 test_thrustRejectsNonOwned :: Assertion
-test_thrustRejectsNonOwned = validMove [Ship 1 (0, 0) (0, 0) 2 "Ship1" 1 True 10 10 0 0 0] 1 (Thrust 1 (0, 1)) @?= False
+test_thrustRejectsNonOwned = validMove [Ship 1 (0, 0) (0, 0) 2 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Thrust 1 (0, 1)) @?= False
 
 test_thrustRejectsDamaged :: Assertion
-test_thrustRejectsDamaged = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 1 0] 1 (Thrust 1 (0, 1)) @?= False
+test_thrustRejectsDamaged = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 1 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Thrust 1 (0, 1)) @?= False
 
 test_thrustRejectsTooLarge :: Assertion
-test_thrustRejectsTooLarge = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0] 1 (Thrust 1 (0, 2)) @?= False
+test_thrustRejectsTooLarge = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 10 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Thrust 1 (0, 2)) @?= False
 
 test_thrustRejectsOutOfFuel :: Assertion
-test_thrustRejectsOutOfFuel = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 0.5 0 0 0] 1 (Thrust 1 (0, 1)) @?= False
+test_thrustRejectsOutOfFuel = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 0.5 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Thrust 1 (0, 1)) @?= False
 
 test_thrustAcceptsOtherCases :: Assertion
-test_thrustAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 5 0 0 0] 1 (Thrust 1 (0, 1)) @?= True
+test_thrustAcceptsOtherCases = validMove [Ship 1 (0, 0) (0, 0) 1 "Ship1" 1 True 10 5 0 0 0 10 False 0 0 0 0 0 0 0 0 0 0] 1 (Thrust 1 (0, 1)) @?= True

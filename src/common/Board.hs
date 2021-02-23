@@ -66,7 +66,19 @@ data Entity
         fuel :: Double,
         weaponDamage :: Int,
         driveDamage :: Int,
-        structureDamage :: Int
+        structureDamage :: Int,
+        cargoCapacity :: Int,
+        isCivilian :: Bool,
+        mineQty :: Int,
+        torpedoQty :: Int,
+        nukeQty :: Int,
+        scannerQty :: Int,
+        pmGrappleQty :: Int,
+        automatedMineQty :: Int,
+        robotGuardQty :: Int,
+        oreQty :: Int,
+        ctShardQty :: Int,
+        mcrQty :: Int
       }
   deriving (Show, Eq)
 
@@ -129,24 +141,62 @@ serializeEntity (AsteroidCluster idNum (x, y)) =
       serializeDouble x,
       serializeDouble y
     ]
-serializeEntity (Ship idNum (x, y) (dx, dy) owner name strength isDefensive fuelCap fuel weaponDamage driveDamage structureDamage) =
-  serializeGroupList
-    [ B.pack "Ship",
-      serializeInt idNum,
-      serializeDouble x,
-      serializeDouble y,
-      serializeDouble dx,
-      serializeDouble dy,
-      serializeInt owner,
-      B.pack name,
-      serializeInt strength,
-      serializeBool isDefensive,
-      serializeDouble fuelCap,
-      serializeDouble fuel,
-      serializeInt weaponDamage,
-      serializeInt driveDamage,
-      serializeInt structureDamage
-    ]
+serializeEntity
+  ( Ship
+      idNum
+      (x, y)
+      (dx, dy)
+      owner
+      name
+      strength
+      isDefensive
+      fuelCap
+      fuel
+      weaponDamage
+      driveDamage
+      structureDamage
+      cargoCapacity
+      isCivilian
+      mineQty
+      torpedoQty
+      nukeQty
+      scannerQty
+      pmGrappleQty
+      automatedMineQty
+      robotGuardQty
+      oreQty
+      ctShardQty
+      mcrQty
+    ) =
+    serializeGroupList
+      [ B.pack "Ship",
+        serializeInt idNum,
+        serializeDouble x,
+        serializeDouble y,
+        serializeDouble dx,
+        serializeDouble dy,
+        serializeInt owner,
+        B.pack name,
+        serializeInt strength,
+        serializeBool isDefensive,
+        serializeDouble fuelCap,
+        serializeDouble fuel,
+        serializeInt weaponDamage,
+        serializeInt driveDamage,
+        serializeInt structureDamage,
+        serializeInt cargoCapacity,
+        serializeBool isCivilian,
+        serializeInt mineQty,
+        serializeInt torpedoQty,
+        serializeInt nukeQty,
+        serializeInt scannerQty,
+        serializeInt pmGrappleQty,
+        serializeInt automatedMineQty,
+        serializeInt robotGuardQty,
+        serializeInt oreQty,
+        serializeInt ctShardQty,
+        serializeInt mcrQty
+      ]
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
 --- does not expect the terminating EOT
@@ -169,19 +219,85 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
       x' <- parseDouble x
       y' <- parseDouble y
       return (AsteroidCluster idNum' (x', y'))
-    parseEntityHelper ["Ship", idNum, x, y, dx, dy, owner, name, strength, isDefensive, fuelCap, fuel, weaponDamage, driveDamage, structureDamage] = do
-      idNum' <- parseInt idNum
-      x' <- parseDouble x
-      y' <- parseDouble y
-      dx' <- parseDouble dx
-      dy' <- parseDouble dy
-      owner' <- parseInt owner
-      strength' <- parseInt strength
-      isDefensive' <- parseBool isDefensive
-      fuelCap' <- parseDouble fuelCap
-      fuel' <- parseDouble fuel
-      weaponDamage' <- parseInt weaponDamage
-      driveDamage' <- parseInt driveDamage
-      structureDamage' <- parseInt structureDamage
-      return (Ship idNum' (x', y') (dx', dy') owner' name strength' isDefensive' fuelCap' fuel' weaponDamage' driveDamage' structureDamage')
+    parseEntityHelper
+      [ "Ship",
+        idNum,
+        x,
+        y,
+        dx,
+        dy,
+        owner,
+        name,
+        strength,
+        isDefensive,
+        fuelCap,
+        fuel,
+        weaponDamage,
+        driveDamage,
+        structureDamage,
+        cargoCapacity,
+        isCivilian,
+        mineQty,
+        torpedoQty,
+        nukeQty,
+        scannerQty,
+        pmGrappleQty,
+        automatedMineQty,
+        robotGuardQty,
+        oreQty,
+        ctShardQty,
+        mcrQty
+        ] = do
+        idNum' <- parseInt idNum
+        x' <- parseDouble x
+        y' <- parseDouble y
+        dx' <- parseDouble dx
+        dy' <- parseDouble dy
+        owner' <- parseInt owner
+        strength' <- parseInt strength
+        isDefensive' <- parseBool isDefensive
+        fuelCap' <- parseDouble fuelCap
+        fuel' <- parseDouble fuel
+        weaponDamage' <- parseInt weaponDamage
+        driveDamage' <- parseInt driveDamage
+        structureDamage' <- parseInt structureDamage
+        cargoCapacity' <- parseInt cargoCapacity
+        isCivilian' <- parseBool isCivilian
+        mineQty' <- parseInt mineQty
+        torpedoQty' <- parseInt torpedoQty
+        nukeQty' <- parseInt nukeQty
+        scannerQty' <- parseInt scannerQty
+        pmGrappleQty' <- parseInt pmGrappleQty
+        automatedMineQty' <- parseInt automatedMineQty
+        robotGuardQty' <- parseInt robotGuardQty
+        oreQty' <- parseInt oreQty
+        ctShardQty' <- parseInt ctShardQty
+        mcrQty' <- parseInt mcrQty
+        return
+          ( Ship
+              idNum'
+              (x', y')
+              (dx', dy')
+              owner'
+              name
+              strength'
+              isDefensive'
+              fuelCap'
+              fuel'
+              weaponDamage'
+              driveDamage'
+              structureDamage'
+              cargoCapacity'
+              isCivilian'
+              mineQty'
+              torpedoQty'
+              nukeQty'
+              scannerQty'
+              pmGrappleQty'
+              automatedMineQty'
+              robotGuardQty'
+              oreQty'
+              ctShardQty'
+              mcrQty'
+          )
     parseEntityHelper _ = Nothing
