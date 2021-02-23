@@ -84,10 +84,12 @@ data Entity
     ---  - some id
     ---  - some x, y position
     ---  - some dx, dy velocity
+    ---  - a time to live in number of turns
     Mine
       { idNum :: Int,
         position :: Vec2,
-        velocity :: Vec2
+        velocity :: Vec2,
+        timeToLive :: Int
       }
   | --- Torpedo with:
     ---  - some id
@@ -96,7 +98,8 @@ data Entity
     Torpedo
       { idNum :: Int,
         position :: Vec2,
-        velocity :: Vec2
+        velocity :: Vec2,
+        timeToLive :: Int
       }
   | --- Nuke with:
     ---  - some id
@@ -105,7 +108,8 @@ data Entity
     Nuke
       { idNum :: Int,
         position :: Vec2,
-        velocity :: Vec2
+        velocity :: Vec2,
+        timeToLive :: Int
       }
   deriving (Show, Eq)
 
@@ -224,32 +228,35 @@ serializeEntity
         serializeInt ctShardQty,
         serializeInt mcrQty
       ]
-serializeEntity (Mine idNum (x, y) (dx, dy)) =
+serializeEntity (Mine idNum (x, y) (dx, dy) ttl) =
   serializeGroupList
     [ B.pack "Mine",
       serializeInt idNum,
       serializeDouble x,
       serializeDouble y,
       serializeDouble dx,
-      serializeDouble dy
+      serializeDouble dy,
+      serializeInt ttl
     ]
-serializeEntity (Torpedo idNum (x, y) (dx, dy)) =
+serializeEntity (Torpedo idNum (x, y) (dx, dy) ttl) =
   serializeGroupList
     [ B.pack "Torpedo",
       serializeInt idNum,
       serializeDouble x,
       serializeDouble y,
       serializeDouble dx,
-      serializeDouble dy
+      serializeDouble dy,
+      serializeInt ttl
     ]
-serializeEntity (Nuke idNum (x, y) (dx, dy)) =
+serializeEntity (Nuke idNum (x, y) (dx, dy) ttl) =
   serializeGroupList
     [ B.pack "Nuke",
       serializeInt idNum,
       serializeDouble x,
       serializeDouble y,
       serializeDouble dx,
-      serializeDouble dy
+      serializeDouble dy,
+      serializeInt ttl
     ]
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
@@ -354,25 +361,28 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
               ctShardQty'
               mcrQty'
           )
-    parseEntityHelper ["Mine", idNum, x, y, dx, dy] = do
+    parseEntityHelper ["Mine", idNum, x, y, dx, dy, ttl] = do
       idNum' <- parseInt idNum
       x' <- parseDouble x
       y' <- parseDouble y
       dx' <- parseDouble dx
       dy' <- parseDouble dy
-      return (Mine idNum' (x', y') (dx', dy'))
-    parseEntityHelper ["Torpedo", idNum, x, y, dx, dy] = do
+      ttl' <- parseInt ttl
+      return (Mine idNum' (x', y') (dx', dy') ttl')
+    parseEntityHelper ["Torpedo", idNum, x, y, dx, dy, ttl] = do
       idNum' <- parseInt idNum
       x' <- parseDouble x
       y' <- parseDouble y
       dx' <- parseDouble dx
       dy' <- parseDouble dy
-      return (Torpedo idNum' (x', y') (dx', dy'))
-    parseEntityHelper ["Nuke", idNum, x, y, dx, dy] = do
+      ttl' <- parseInt ttl
+      return (Torpedo idNum' (x', y') (dx', dy') ttl')
+    parseEntityHelper ["Nuke", idNum, x, y, dx, dy, ttl] = do
       idNum' <- parseInt idNum
       x' <- parseDouble x
       y' <- parseDouble y
       dx' <- parseDouble dx
       dy' <- parseDouble dy
-      return (Nuke idNum' (x', y') (dx', dy'))
+      ttl' <- parseInt ttl
+      return (Nuke idNum' (x', y') (dx', dy') ttl')
     parseEntityHelper _ = Nothing

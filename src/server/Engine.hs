@@ -71,34 +71,37 @@ resolveCombat attacker target = do
 
 --- updates the board after the orders phase
 postOrderTick :: Board -> Board
-postOrderTick b = map postOrderTickOne (filter (not . destroyed) b)
+postOrderTick b = filter (not . destroyed) (map motionTick b)
   where
     destroyed :: Entity -> Bool
     destroyed Ship {structureDamage} = structureDamage == maxDamage
+    destroyed Mine {timeToLive} = timeToLive == 0
+    destroyed Torpedo {timeToLive} = timeToLive == 0
+    destroyed Nuke {timeToLive} = timeToLive == 0
     destroyed _ = False
 
-    postOrderTickOne :: Entity -> Entity
-    postOrderTickOne ship@Ship {position, velocity} =
+    motionTick :: Entity -> Entity
+    motionTick ship@Ship {position, velocity} =
       ship
         { position = position `vecAdd` velocity,
           velocity = velocity `vecAdd` gravityAt b position
         }
-    postOrderTickOne mine@Mine {position, velocity} =
+    motionTick mine@Mine {position, velocity} =
       mine
         { position = position `vecAdd` velocity,
           velocity = velocity `vecAdd` gravityAt b position
         }
-    postOrderTickOne torpedo@Torpedo {position, velocity} =
+    motionTick torpedo@Torpedo {position, velocity} =
       torpedo
         { position = position `vecAdd` velocity,
           velocity = velocity `vecAdd` gravityAt b position
         }
-    postOrderTickOne nuke@Nuke {position, velocity} =
+    motionTick nuke@Nuke {position, velocity} =
       nuke
         { position = position `vecAdd` velocity,
           velocity = velocity `vecAdd` gravityAt b position
         }
-    postOrderTickOne other = other
+    motionTick other = other
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
