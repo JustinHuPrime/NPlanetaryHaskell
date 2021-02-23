@@ -83,6 +83,21 @@ postOrderTick b = map postOrderTickOne (filter (not . destroyed) b)
         { position = position `vecAdd` velocity,
           velocity = velocity `vecAdd` gravityAt b position
         }
+    postOrderTickOne mine@Mine {position, velocity} =
+      mine
+        { position = position `vecAdd` velocity,
+          velocity = velocity `vecAdd` gravityAt b position
+        }
+    postOrderTickOne torpedo@Torpedo {position, velocity} =
+      torpedo
+        { position = position `vecAdd` velocity,
+          velocity = velocity `vecAdd` gravityAt b position
+        }
+    postOrderTickOne nuke@Nuke {position, velocity} =
+      nuke
+        { position = position `vecAdd` velocity,
+          velocity = velocity `vecAdd` gravityAt b position
+        }
     postOrderTickOne other = other
 
 --- filters out invalid moves

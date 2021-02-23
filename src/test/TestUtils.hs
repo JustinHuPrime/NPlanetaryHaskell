@@ -100,7 +100,28 @@ instance Arbitrary Entity where
                 oreQty
                 ctShardQty
                 mcrQty
-            )
+            ),
+        do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          dx <- (arbitrary :: Gen Double)
+          dy <- (arbitrary :: Gen Double)
+          return (Mine idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy)),
+        do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          dx <- (arbitrary :: Gen Double)
+          dy <- (arbitrary :: Gen Double)
+          return (Torpedo idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy)),
+        do
+          idNum <- arbitrary
+          x <- (arbitrary :: Gen Double)
+          y <- (arbitrary :: Gen Double)
+          dx <- (arbitrary :: Gen Double)
+          dy <- (arbitrary :: Gen Double)
+          return (Nuke idNum (limitPrecision x, limitPrecision y) (limitPrecision dx, limitPrecision dy))
       ]
 
 instance Arbitrary Move where

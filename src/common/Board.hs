@@ -80,6 +80,33 @@ data Entity
         ctShardQty :: Int,
         mcrQty :: Int
       }
+  | --- Mine with:
+    ---  - some id
+    ---  - some x, y position
+    ---  - some dx, dy velocity
+    Mine
+      { idNum :: Int,
+        position :: Vec2,
+        velocity :: Vec2
+      }
+  | --- Torpedo with:
+    ---  - some id
+    ---  - some x, y position
+    ---  - some dx, dy velocity
+    Torpedo
+      { idNum :: Int,
+        position :: Vec2,
+        velocity :: Vec2
+      }
+  | --- Nuke with:
+    ---  - some id
+    ---  - some x, y position
+    ---  - some dx, dy velocity
+    Nuke
+      { idNum :: Int,
+        position :: Vec2,
+        velocity :: Vec2
+      }
   deriving (Show, Eq)
 
 findId :: Int -> Board -> Maybe Entity
@@ -197,6 +224,33 @@ serializeEntity
         serializeInt ctShardQty,
         serializeInt mcrQty
       ]
+serializeEntity (Mine idNum (x, y) (dx, dy)) =
+  serializeGroupList
+    [ B.pack "Mine",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y,
+      serializeDouble dx,
+      serializeDouble dy
+    ]
+serializeEntity (Torpedo idNum (x, y) (dx, dy)) =
+  serializeGroupList
+    [ B.pack "Torpedo",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y,
+      serializeDouble dx,
+      serializeDouble dy
+    ]
+serializeEntity (Nuke idNum (x, y) (dx, dy)) =
+  serializeGroupList
+    [ B.pack "Nuke",
+      serializeInt idNum,
+      serializeDouble x,
+      serializeDouble y,
+      serializeDouble dx,
+      serializeDouble dy
+    ]
 
 --- parses a bytestring representing a board into a list of entities, ignoring invalid ones
 --- does not expect the terminating EOT
@@ -300,4 +354,25 @@ parseEntity s = parseEntityHelper (map B.unpack (B.split '\x1D' s))
               ctShardQty'
               mcrQty'
           )
+    parseEntityHelper ["Mine", idNum, x, y, dx, dy] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      dx' <- parseDouble dx
+      dy' <- parseDouble dy
+      return (Mine idNum' (x', y') (dx', dy'))
+    parseEntityHelper ["Torpedo", idNum, x, y, dx, dy] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      dx' <- parseDouble dx
+      dy' <- parseDouble dy
+      return (Torpedo idNum' (x', y') (dx', dy'))
+    parseEntityHelper ["Nuke", idNum, x, y, dx, dy] = do
+      idNum' <- parseInt idNum
+      x' <- parseDouble x
+      y' <- parseDouble y
+      dx' <- parseDouble dx
+      dy' <- parseDouble dy
+      return (Nuke idNum' (x', y') (dx', dy'))
     parseEntityHelper _ = Nothing
