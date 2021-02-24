@@ -1,5 +1,5 @@
 {-
-Copyright 2020 Justin Hu
+Copyright 2020 Justin Hu, Johann Cooper
 
 SPDX-Licence-Identifier: AGPL-3.0-or-later
 
