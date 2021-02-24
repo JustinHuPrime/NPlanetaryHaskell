@@ -28,6 +28,7 @@ import NetInterface
 import Network.Socket
 import Networking
 import System.Exit
+import Theme
 import UI
 
 openWindow :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
@@ -39,7 +40,7 @@ openWindow board boardLock moveList moveListLock s = do
   initialDisplayMode $= [DoubleBuffered]
   -- TODO: probably need to setup openGL versions and such
   _ <- createWindow "N-Planetary"
-  fullScreen
+  windowSize $= Size (fromIntegral windowWidth) (fromIntegral windowHeight)
 
   displayCallback $= display board boardLock
   -- TODO: add more input callbacks as needed

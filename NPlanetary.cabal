@@ -50,9 +50,11 @@ executable nplanetary-client
   main-is:             Main.hs
   other-modules:       
     Board,
+    Helper,
     Move,
     NetInterface,
     Networking,
+    Theme,
     UI,
     Util,
     Serializing
