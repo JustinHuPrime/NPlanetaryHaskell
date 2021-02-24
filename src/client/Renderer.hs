@@ -5,15 +5,15 @@ import Board ( Board, Entity(Ship, AstroObj, AsteroidCluster) )
 import Theme
 import Util
 
+circle :: (Double, Double) -> Double -> Int -> [(Double, Double)]
 circle (x, y) radius vertices = map toPoint angles
   where
     arc       = 2.0 * pi / fromIntegral vertices
     toPoint a = (x + cos a * radius, y + sin a * radius)
     angles    = map ((*arc) . fromIntegral) [0..vertices]
 
-renderFan points layer = do
-    renderPrimitive TriangleFan $ do
-      mapM_ (\(x, y) -> vertex (Vertex3 x y layer)) points
+renderFan :: [(Double, Double)] -> Double -> IO ()
+renderFan points layer = renderPrimitive TriangleFan $ mapM_ (\(x, y) -> vertex (Vertex3 x y layer)) points
 
 renderCircle :: Vec2 -> Double -> Double -> Int -> IO ()
 renderCircle position radius layer vertices = renderFan (position : circle position radius vertices) layer
