@@ -1,8 +1,7 @@
-module Helper where
+module Renderer where
 
-import Graphics.Rendering.OpenGL.GL as GL
-
-import Board
+import Graphics.Rendering.OpenGL.GL
+import Board ( Board, Entity(Ship, AstroObj, AsteroidCluster) )
 import Theme
 import Util
 

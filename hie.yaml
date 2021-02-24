@@ -54,7 +54,7 @@ cradle:
     - path: "src/common/Serializing.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
-    - path: "src/client/Helper.hs"
+    - path: "src/client/Renderer.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client/Main.hs"

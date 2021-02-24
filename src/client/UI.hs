@@ -24,7 +24,7 @@ import Data.IORef
 import Graphics.UI.GLUT as GLUT
 import Graphics.Rendering.OpenGL.GL as GL
 import Move
-import Helper
+import Renderer
 
 --- display the window
 display :: IORef Board -> Lock.Lock -> DisplayCallback
