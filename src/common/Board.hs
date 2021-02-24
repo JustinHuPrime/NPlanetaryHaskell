@@ -70,6 +70,27 @@ data Entity
       }
   deriving (Show, Eq)
 
+data ShipClass
+  = Transport
+  | Packet
+  | Tanker
+  | Liner
+  | Corvette
+  | Destroyer
+  | Cruiser
+  | Battleship
+  deriving (Show, Eq)
+
+newShip :: ShipClass -> Int -> Vec2 -> Vec2 -> Int -> String -> Entity
+newShip Transport _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 1, isDefensive = True, fuelCapacity = 10, fuel = 10, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Packet _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 2, isDefensive = False, fuelCapacity = 10, fuel = 10, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Tanker _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 1, isDefensive = True, fuelCapacity = 50, fuel = 50, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Liner _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 2, isDefensive = True, fuelCapacity = 10, fuel = 10, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Corvette _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 2, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Destroyer _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 4, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Cruiser _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 8, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+newShip Battleship _idNum _position _velocity _owner _name = Ship {idNum = _idNum, position = _position, velocity = _velocity, owner = _owner, name = _name, strength = 15, isDefensive = False, fuelCapacity = 15, fuel = 15, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+
 findId :: Int -> Board -> Maybe Entity
 findId searchFor = find (\e -> searchFor == idNum e)
 
@@ -104,6 +125,15 @@ alwaysVisible _ = False
 isPlayerShip :: Int -> Entity -> Bool
 isPlayerShip playerId Ship {owner} = playerId == owner
 isPlayerShip _ _ = False
+
+initialBoard :: Int -> Board
+initialBoard 2 =
+  [ AstroObj {idNum = 0, position = (0, 0), name = "Sun", mass = 3, radius = 0.5},
+    AsteroidCluster {idNum = 1, position = (10, 0)},
+    newShip Cruiser 2 (0, 5) (0, 0) 1 "P1 Cruiser",
+    newShip Cruiser 3 (0, -5) (0, 0) 2 "P2 Cruiser"
+  ]
+initialBoard _ = error "invalid number of players"
 
 --- serializes a board into a list of serialized entities separated by file separators and terminated by an end-of-transmission (EOT) byte
 serializeBoard :: Board -> B.ByteString
