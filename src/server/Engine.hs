@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-
 Copyright 2020 Justin Hu
 
@@ -22,6 +23,7 @@ module Engine where
 import Balance
 import Board
 import Control.Monad
+import Data.List
 import Move
 import Util
 
@@ -87,16 +89,21 @@ postOrderTick b = map postOrderTickOne (filter (not . destroyed) b)
 
 --- filters out invalid moves
 validateMoves :: Board -> Int -> [Move] -> [Move]
-validateMoves b playerId = filter (validMove b playerId)
+validateMoves b playerId moves = nubBy duplicateMove (filter (validMove b playerId) moves)
+
+duplicateMove :: Move -> Move -> Bool
+duplicateMove (Thrust id1 _) (Thrust id2 _) = id1 == id2
+duplicateMove (Attack id1 _) (Attack id2 _) = id1 == id2
+duplicateMove _ _ = False
 
 validMove :: Board -> Int -> Move -> Bool
-validMove b playerId (Thrust idNum vec) =
+validMove b playerId Thrust {Move.idNum, dv} =
   case ship of
     Just Ship {owner, fuel, driveDamage} ->
       owner == playerId
         && driveDamage == 0
-        && magnitude vec <= 1
-        && magnitude vec <= fuel
+        && magnitude dv <= 1
+        && magnitude dv <= fuel
     _ -> False
   where
     ship = findId idNum b
