@@ -21,21 +21,23 @@ module UI where
 import Board
 import qualified Control.Concurrent.Lock as Lock
 import Data.IORef
-import Graphics.UI.GLUT as GLUT
-import Graphics.Rendering.OpenGL.GL as GL
+import Graphics.UI.GLUT
 import Move
 import Renderer
 
 --- display the window
 display :: IORef Board -> Lock.Lock -> DisplayCallback
 display board boardLock = do
-  GL.clearColor $= GL.Color4 1 1 1 1
-  GL.clear [ColorBuffer]
+  clearColor $= Color4 1 1 1 1
+  clear [ColorBuffer]
 
+  Lock.acquire boardLock
   board' <- readIORef board
+  Lock.release boardLock
+
   renderBoard board'
 
-  GLUT.swapBuffers
+  swapBuffers
 
 --- handles window resizing
 reshape :: ReshapeCallback
