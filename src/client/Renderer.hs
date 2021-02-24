@@ -21,19 +21,18 @@ renderCircle position radius layer vertices = renderFan (position : circle posit
 renderBoard :: Board -> IO ()
 renderBoard = mapM_ renderEntity
 
--- TODO: change layers for each entity
 -- TODO: add colors from theme
 renderEntity :: Entity -> IO ()
 renderEntity (AstroObj _ (x, y) _ _ radius) = renderCircle position radius' layer 32
   where
     position = (x / fromIntegral windowWidth, y / fromIntegral windowHeight)
     radius' = radius / fromIntegral windowWidth
-    layer = 0.0
+    layer = -0.9
 renderEntity (AsteroidCluster _ (x, y))          = renderCircle position radius layer 32
   where
     position = (x / fromIntegral windowWidth, y / fromIntegral windowHeight)
     radius = 10.0 / fromIntegral windowWidth
-    layer = 0.0
+    layer = -0.9
 renderEntity (Ship _ (x, y) _ _ _ _ _ _ _ _ _ _) = renderCircle position radius layer 32
   where
     position = (x / fromIntegral windowWidth, y / fromIntegral windowHeight)
