@@ -89,7 +89,7 @@ acceptConns currentPlayer numPlayers board newBoardSem sentBoardSem moveList mov
 
 server :: Int -> IO ()
 server numPlayers = do
-  board <- newIORef [] :: IO (IORef Board)
+  board <- newIORef (initialBoard numPlayers) :: IO (IORef Board)
   newBoardSem <- newQSemN 0
   sentBoardSem <- newQSemN 0
   moveList <- newIORef [] :: IO (IORef [[Move]])
