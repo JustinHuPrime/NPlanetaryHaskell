@@ -51,6 +51,7 @@ executable nplanetary-client
   other-modules:       
     Balance,
     Board,
+    Interaction,
     Move,
     NetInterface,
     Networking,

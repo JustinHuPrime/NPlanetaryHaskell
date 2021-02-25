@@ -50,6 +50,13 @@ openWindow board boardLock moveList moveListLock s = do
 
   mainLoop
 
+initBoard :: Board
+initBoard = [
+  Ship 0 (  0,   0) (0, 0) 2 "test_0" 0 False 0 0 0 0 0,
+  Ship 1 ( 25,  25) (0, 0) 2 "test_1" 0 False 0 0 0 0 0,
+  Ship 2 (-25, -25) (0, 0) 2 "test_2" 0 False 0 0 0 0 0
+  ]
+
 client :: String -> IO ()
 client serverAddr = do
   board <- newIORef [] :: IO (IORef Board)

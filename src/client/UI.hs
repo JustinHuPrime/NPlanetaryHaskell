@@ -19,9 +19,10 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module UI where
 
 import Board
-import qualified Control.Concurrent.Lock as Lock
-import Data.IORef
 import Graphics.UI.GLUT
+import Interaction
+import Data.IORef
+import qualified Control.Concurrent.Lock as Lock
 import Move
 import Renderer
 
@@ -47,10 +48,20 @@ reshape size = do
 
 --- handles keyboard and mouse events
 keyboardMouse :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> KeyboardMouseCallback
-keyboardMouse board boardLock moveList moveListLock pressed state modifiers position = do
-  -- TODO: write this
-  -- probably want to look at changing the cursor to avoid needing to render text?
-  return ()
+keyboardMouse board boardLock moveList moveListLock key keyState _ mousePos = do
+  Lock.acquire boardLock
+  board' <- readIORef board
+  Lock.release boardLock
+
+  Lock.acquire moveListLock
+  moveList' <- readIORef moveList
+  Lock.release moveListLock
+
+  updatedMoveList <- handleInput board' moveList' key keyState mousePos
+
+  Lock.acquire moveListLock
+  writeIORef moveList updatedMoveList
+  Lock.release moveListLock
 
 --- handles idling
 idle :: IORef Board -> Lock.Lock -> IdleCallback

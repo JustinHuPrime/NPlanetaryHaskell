@@ -23,8 +23,8 @@ import Board
 import Graphics.Rendering.OpenGL.GL
 import Util
 
-canvasToWorld :: Vec2 -> Vec2
-canvasToWorld (x, y) = (x / mapBorder , y / mapBorder )
+worldToCanvas :: Vec2 -> Vec2
+worldToCanvas (x, y) = (x / mapBorder, y / mapBorder)
 
 renderCircle :: Vec2 -> Double -> Int -> (Double, Double, Double) -> Double -> IO ()
 renderCircle (x, y) radius numVertices (r, g, b) layer  = renderPrimitive TriangleFan (sequence_ [color', vertices])
@@ -41,20 +41,20 @@ renderCircle (x, y) radius numVertices (r, g, b) layer  = renderPrimitive Triang
 renderEntity :: Entity -> IO ()
 renderEntity (AstroObj _ (x, y) _ _ r) = renderCircle center radius 32 color layer
   where
-    center = canvasToWorld (x, y)
-    radius = fst (canvasToWorld (r, 0))
-    color = (0.03, 0.56, 0.31)
+    center = worldToCanvas (x, y)
+    radius = fst (worldToCanvas (r, 0))
+    color = (1.0, 0.92, 0.44)
     layer = -0.9
 renderEntity (AsteroidCluster _ (x, y)) = renderCircle center radius 32 color layer
   where
-    center = canvasToWorld (x, y)
-    radius = fst (canvasToWorld (1, 0))
+    center = worldToCanvas (x, y)
+    radius = fst (worldToCanvas (0.5, 0))
     color = (0.8, 0.8, 0.8)
     layer = -0.9
 renderEntity (Ship _ (x, y) _ owner _ _ _ _ _ _ _ _) = renderCircle center radius 32 color layer
   where
-    center = canvasToWorld (x, y)
-    radius = fst (canvasToWorld (1, 0))
+    center = worldToCanvas (x, y)
+    radius = fst (worldToCanvas (0.5, 0))
     color = if owner == 1 then (1.0, 0.25, 0.31) else (0.42, 0.58, 0.94)
     layer = 0.0
 
