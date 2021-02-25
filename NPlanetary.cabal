@@ -53,6 +53,8 @@ executable nplanetary-client
     Move,
     NetInterface,
     Networking,
+    Renderer,
+    Theme,
     UI,
     Util,
     Serializing

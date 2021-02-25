@@ -1,5 +1,5 @@
 {-
-Copyright 2020 Justin Hu
+Copyright 2020 Justin Hu, Johann Cooper
 
 SPDX-Licence-Identifier: AGPL-3.0-or-later
 
@@ -23,11 +23,20 @@ import qualified Control.Concurrent.Lock as Lock
 import Data.IORef
 import Graphics.UI.GLUT
 import Move
+import Renderer
 
---- display the board
+--- display the window
 display :: IORef Board -> Lock.Lock -> DisplayCallback
 display board boardLock = do
-  -- TODO: write this
+  clearColor $= Color4 1 1 1 1
+  clear [ColorBuffer]
+
+  Lock.acquire boardLock
+  board' <- readIORef board
+  Lock.release boardLock
+
+  renderBoard board'
+
   swapBuffers
 
 --- handles window resizing

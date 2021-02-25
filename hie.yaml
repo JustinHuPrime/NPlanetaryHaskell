@@ -54,6 +54,9 @@ cradle:
     - path: "src/common/Serializing.hs"
       component: "NPlanetary:exe:nplanetary-server"
 
+    - path: "src/client/Renderer.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
     - path: "src/client/Main.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
@@ -70,6 +73,9 @@ cradle:
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client/Networking.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
+    - path: "src/client/Theme.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
     - path: "src/client/UI.hs"
