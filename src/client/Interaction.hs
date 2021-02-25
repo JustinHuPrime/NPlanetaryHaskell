@@ -20,9 +20,13 @@ module Interaction where
 
 import Balance
 import Board
-import Data.Maybe
+import qualified Control.Concurrent.Lock as Lock
+import Data.IORef
+import Data.Maybe ( fromJust, isJust )
 import Graphics.UI.GLUT
 import Move
+import Network.Socket
+import Networking
 import Theme
 import Util
 
@@ -51,16 +55,31 @@ getClickedMapPos :: Key -> KeyState -> Position -> Maybe Vec2
 getClickedMapPos (MouseButton RightButton) Up (Position x y) = Just (windowToWorld (fromIntegral x, fromIntegral y))
 getClickedMapPos _ _ _ = Nothing
 
-handleInput :: Board -> [Move] -> Key -> KeyState -> Position -> IO [Move]
-handleInput board moveList key keyState mousePos = do
+handleMoves :: Board -> IORef [Move] -> Lock.Lock -> Key -> KeyState -> Position -> IO ()
+handleMoves board moveList moveListLock key keyState mousePos = do
+  Lock.acquire moveListLock
   let clickedShip = getClickedShip key keyState mousePos board
-  print (isJust clickedShip)
-
-  let moves = [Thrust (Board.idNum (fromJust clickedShip)) (0, 1) | isJust clickedShip]
-  -- let moves = [Thrust 2 (0, 1) | isJust clickedShip]
+  if isJust clickedShip then print "clicked" else return ()
 
   let clickedMapPos = getClickedMapPos key keyState mousePos
 
+  let updatedMoveList = [Thrust (Board.idNum (fromJust clickedShip)) (1, 0) | isJust clickedShip]
+  writeIORef moveList updatedMoveList
+  Lock.release moveListLock
 
+sendMovesToServer :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Key -> KeyState -> IO ()
+sendMovesToServer socket board boardLock moveList moveListLock (SpecialKey KeyUp) Up = do
+  Lock.acquire moveListLock
+  moveList' <- readIORef moveList
+  sendMoves socket moveList'
+  writeIORef moveList []
+  print "sent"
+  -- updateBoardState socket board boardLock
+  print "board updated"
+  Lock.release moveListLock
+sendMovesToServer _ _ _ _ _ _ _ = return ()
 
-  return moves
+updateBoardState :: Socket -> IORef Board -> Lock.Lock -> IO ()
+updateBoardState socket board boardLock = do
+  board' <- readBoard socket
+  writeIORef board board'

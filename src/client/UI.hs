@@ -24,12 +24,13 @@ import Interaction
 import Data.IORef
 import qualified Control.Concurrent.Lock as Lock
 import Move
+import Network.Socket
 import Renderer
 
 --- display the window
 display :: IORef Board -> Lock.Lock -> DisplayCallback
 display board boardLock = do
-  clearColor $= Color4 1 1 1 1
+  clearColor $= Color4 0 0 0 1
   clear [ColorBuffer]
 
   Lock.acquire boardLock
@@ -47,21 +48,14 @@ reshape size = do
   postRedisplay Nothing
 
 --- handles keyboard and mouse events
-keyboardMouse :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> KeyboardMouseCallback
-keyboardMouse board boardLock moveList moveListLock key keyState _ mousePos = do
+keyboardMouse :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> KeyboardMouseCallback
+keyboardMouse socket board boardLock moveList moveListLock key keyState _ mousePos = do
   Lock.acquire boardLock
   board' <- readIORef board
   Lock.release boardLock
 
-  Lock.acquire moveListLock
-  moveList' <- readIORef moveList
-  Lock.release moveListLock
-
-  updatedMoveList <- handleInput board' moveList' key keyState mousePos
-
-  Lock.acquire moveListLock
-  writeIORef moveList updatedMoveList
-  Lock.release moveListLock
+  handleMoves board' moveList moveListLock key keyState mousePos
+  sendMovesToServer socket board boardLock moveList moveListLock key keyState
 
 --- handles idling
 idle :: IORef Board -> Lock.Lock -> IdleCallback

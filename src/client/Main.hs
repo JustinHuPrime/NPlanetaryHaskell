@@ -44,7 +44,7 @@ openWindow board boardLock moveList moveListLock s = do
 
   displayCallback $= display board boardLock
   -- TODO: add more input callbacks as needed
-  keyboardMouseCallback $= Just (keyboardMouse board boardLock moveList moveListLock)
+  keyboardMouseCallback $= Just (keyboardMouse s board boardLock moveList moveListLock)
   idleCallback $= Just (idle board boardLock)
   closeCallback $= Just (close s)
 
