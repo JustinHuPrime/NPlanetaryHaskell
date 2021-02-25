@@ -49,6 +49,7 @@ executable nplanetary-server
 executable nplanetary-client
   main-is:             Main.hs
   other-modules:       
+    Balance,
     Board,
     Move,
     NetInterface,
