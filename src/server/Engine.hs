@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-
-Copyright 2020 Justin Hu
+Copyright 2020 Justin Hu, Bronwyn Damm
 
 SPDX-Licence-Identifier: AGPL-3.0-or-later
 
@@ -52,7 +52,12 @@ resolveOrders ml b = foldM resolveOrder b ml
 
 --- resolves an order
 resolveOrder :: Board -> Move -> IO Board
-resolveOrder b Thrust {Move.idNum = idNum', dv = dv'} = return (map (\e -> if Board.idNum e == idNum' then e {velocity = velocity e `vecAdd` dv'} else e) b)
+resolveOrder b Thrust {Move.idNum = idNum', dv = dv'} = return (map resolveThrust b)
+  where
+    resolveThrust e = 
+      if Board.idNum e == idNum' 
+        then e {velocity = velocity e `vecAdd` dv', fuel = fuel e - magnitude dv'} 
+        else e
 resolveOrder b Attack {attacker, target} = mapM resolveAttack b
   where
     attacker' = case findId attacker b of
