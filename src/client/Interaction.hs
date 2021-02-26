@@ -21,6 +21,7 @@ module Interaction where
 import Balance
 import Board
 import qualified Control.Concurrent.Lock as Lock
+import qualified GHC.Base as Control.Monad
 import Data.IORef
 import Data.Maybe ( fromJust, isJust )
 import Graphics.UI.GLUT
@@ -29,6 +30,7 @@ import Network.Socket
 import Networking
 import Theme
 import Util
+
 
 windowToWorld :: Vec2 -> Vec2
 windowToWorld (x, y) = worldPos
@@ -66,32 +68,40 @@ handleMoves board moveList moveListLock selectedEntity selectedEntityLock key ke
   moveList' <- readIORef moveList
   selectedEntity' <- readIORef selectedEntity
 
-  if isJust clickedShip
-    then
-      writeIORef moveList [Thrust (Board.idNum (fromJust clickedShip)) (0, -1)]
-    else
-      writeIORef moveList moveList'
-
   -- -- select new player ship
-  -- if isJust clickedShip && (owner (fromJust clickedShip) == 1)
-  --   then
-  --     writeIORef selectedEntity clickedShip
-  --   else
-  --     writeIORef selectedEntity selectedEntity'
+  Control.Monad.when (isJust clickedShip) $
+      writeIORef selectedEntity clickedShip
 
-  -- -- thrust toward board position
-  -- if isJust selectedEntity' && isJust clickedMapPos
-  --   then
-  --     writeIORef moveList (Thrust 1 (vecUnit (fromJust clickedMapPos)):moveList')
-  --   else
-  --     writeIORef moveList moveList'
+  -- thrust toward board position
+  Control.Monad.when (isJust selectedEntity' && isJust clickedMapPos) $ do
+    let idNum = Board.idNum (fromJust selectedEntity')
+    let (sX, sY) = Board.position (fromJust selectedEntity')
+    let (mX, mY) = fromJust clickedMapPos
+    let dv = vecUnit (mX - sX, mY - sY)
+
+    let newMove = Thrust idNum dv
+    let isNotDuplicate (Thrust id _) = id /= idNum 
+        isNotDuplicate Attack {} = True
+    let filteredMoveList = filter isNotDuplicate moveList'
+
+    writeIORef moveList (newMove:filteredMoveList)
+    writeIORef selectedEntity Nothing
+    print "thrust command queued"
 
   -- -- attack enemy ship
-  -- if isJust selectedEntity' && (owner (fromJust clickedShip) == 2)
-  --   then
-  --     writeIORef moveList (Attack 1 2:moveList')
-  --   else
-  --     writeIORef moveList moveList'
+  Control.Monad.when (isJust selectedEntity' && isJust clickedShip) $ do
+      let attacker = Board.idNum (fromJust selectedEntity')
+      let target = Board.idNum (fromJust clickedShip)
+
+      let newMove = Attack attacker target
+      let isNotDuplicate (Attack id _) = id /= attacker 
+          isNotDuplicate Thrust {} = True
+      let filteredMoveList = filter isNotDuplicate moveList'
+
+      Control.Monad.when (attacker /= target) $ do
+        writeIORef moveList (newMove:filteredMoveList)
+        writeIORef selectedEntity Nothing
+        print "attack command queued"
 
   Lock.release selectedEntityLock
   Lock.release moveListLock
