@@ -18,18 +18,18 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 
 module Theme where
 
-import Graphics.Rendering.OpenGL.GL as GL
 
 import Board
 
 windowWidth :: Int 
-windowWidth = 500
+windowWidth = 720
 
 windowHeight :: Int
-windowHeight = 500
+windowHeight = 720
 
+-- color pallette: https://lospec.com/palette-list/small-sprite-greedy-40
 -- TODO: recolor entities and have unique colors for each player
-entityColor :: Num a => Entity -> GL.Color3 a
-entityColor AstroObj {} = GL.Color3 0 1 0
-entityColor AsteroidCluster {} = GL.Color3 1 0 0
-entityColor Ship {} = GL.Color3 0 0 1
+entityColor :: Entity -> (Double, Double, Double)
+entityColor AstroObj {} = (1, 0, 0)
+entityColor AsteroidCluster {} = (1, 0, 0)
+entityColor Ship {} = (1, 0, 0)

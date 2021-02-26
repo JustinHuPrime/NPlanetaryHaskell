@@ -66,6 +66,9 @@ cradle:
     - path: "src/client/Board.hs"
       component: "NPlanetary:exe:nplanetary-client"
 
+    - path: "src/client/Interaction.hs"
+      component: "NPlanetary:exe:nplanetary-client"
+
     - path: "src/client/Move.hs"
       component: "NPlanetary:exe:nplanetary-client"
 

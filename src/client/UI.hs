@@ -19,16 +19,18 @@ with N-Planetary. If not, see <https://www.gnu.org/licenses/>.
 module UI where
 
 import Board
-import qualified Control.Concurrent.Lock as Lock
-import Data.IORef
 import Graphics.UI.GLUT
+import Interaction
+import Data.IORef
+import qualified Control.Concurrent.Lock as Lock
 import Move
+import Network.Socket
 import Renderer
 
 --- display the window
 display :: IORef Board -> Lock.Lock -> DisplayCallback
 display board boardLock = do
-  clearColor $= Color4 1 1 1 1
+  clearColor $= Color4 0 0 0 1
   clear [ColorBuffer]
 
   Lock.acquire boardLock
@@ -46,11 +48,16 @@ reshape size = do
   postRedisplay Nothing
 
 --- handles keyboard and mouse events
-keyboardMouse :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> KeyboardMouseCallback
-keyboardMouse board boardLock moveList moveListLock pressed state modifiers position = do
-  -- TODO: write this
-  -- probably want to look at changing the cursor to avoid needing to render text?
-  return ()
+keyboardMouse :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> IORef (Maybe Entity) -> Lock.Lock -> KeyboardMouseCallback
+keyboardMouse socket board boardLock moveList moveListLock selectedEntity selectedEntityLock key keyState _ mousePos = do
+  Lock.acquire boardLock
+  board' <- readIORef board
+  Lock.release boardLock
+
+  handleMoves board' moveList moveListLock selectedEntity selectedEntityLock key keyState mousePos
+  sendMovesToServer socket board boardLock moveList moveListLock key keyState
+
+  postRedisplay Nothing
 
 --- handles idling
 idle :: IORef Board -> Lock.Lock -> IdleCallback
