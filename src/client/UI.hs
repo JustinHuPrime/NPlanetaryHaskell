@@ -57,6 +57,8 @@ keyboardMouse socket board boardLock moveList moveListLock selectedEntity select
   handleMoves board' moveList moveListLock selectedEntity selectedEntityLock key keyState mousePos
   sendMovesToServer socket board boardLock moveList moveListLock key keyState
 
+  postRedisplay Nothing
+
 --- handles idling
 idle :: IORef Board -> Lock.Lock -> IdleCallback
 idle board boardLock = do
