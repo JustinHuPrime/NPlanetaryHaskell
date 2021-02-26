@@ -25,7 +25,7 @@ source-repository head
 
 executable nplanetary-server
   main-is:             Main.hs
-  other-modules:       
+  other-modules:
     Engine,
     Networking,
     Balance,
@@ -77,7 +77,7 @@ executable nplanetary-client
 Test-Suite test
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  other-modules:       
+  other-modules:
     TestBoard,
     Board,
     Util,
@@ -89,7 +89,9 @@ Test-Suite test
     TestOrderValidator,
     Balance,
     TestFilterVisible,
-    TestMoveResolver
+    TestMoveResolver,
+    TestPostOrderTick,
+    TestPreOrderTick
   -- other-extensions:
   build-depends:
     base >= 4.13 && < 4.14,
