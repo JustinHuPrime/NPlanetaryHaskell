@@ -23,9 +23,11 @@ import qualified TestBoard
 import qualified TestFilterVisible
 import qualified TestMove
 import qualified TestOrderValidator
+import qualified TestMoveResolver
+import qualified TestPostOrderTick
 
 tests :: [Test]
-tests = [TestBoard.group, TestMove.group, TestOrderValidator.group, TestFilterVisible.group]
+tests = [TestBoard.group, TestMove.group, TestOrderValidator.group, TestFilterVisible.group, TestMoveResolver.group, TestPostOrderTick.group]
 
 main :: IO ()
 main = defaultMain tests
