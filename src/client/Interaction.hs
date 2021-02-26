@@ -66,26 +66,32 @@ handleMoves board moveList moveListLock selectedEntity selectedEntityLock key ke
   moveList' <- readIORef moveList
   selectedEntity' <- readIORef selectedEntity
 
-  -- select new player ship
-  if isJust clickedShip && (owner (fromJust clickedShip) == 1)
+  if isJust clickedShip
     then
-      writeIORef selectedEntity clickedShip
-    else
-      writeIORef selectedEntity selectedEntity'
-
-  -- thrust toward board position
-  if isJust selectedEntity' && isJust clickedMapPos
-    then
-      writeIORef moveList (Thrust 1 (vecUnit (fromJust clickedMapPos)):moveList')
+      writeIORef moveList [Thrust (Board.idNum (fromJust clickedShip)) (0, -1)]
     else
       writeIORef moveList moveList'
 
-  -- attack enemy ship
-  if isJust selectedEntity' && (owner (fromJust clickedShip) == 2)
-    then
-      writeIORef moveList (Attack 1 2:moveList')
-    else
-      writeIORef moveList moveList'
+  -- -- select new player ship
+  -- if isJust clickedShip && (owner (fromJust clickedShip) == 1)
+  --   then
+  --     writeIORef selectedEntity clickedShip
+  --   else
+  --     writeIORef selectedEntity selectedEntity'
+
+  -- -- thrust toward board position
+  -- if isJust selectedEntity' && isJust clickedMapPos
+  --   then
+  --     writeIORef moveList (Thrust 1 (vecUnit (fromJust clickedMapPos)):moveList')
+  --   else
+  --     writeIORef moveList moveList'
+
+  -- -- attack enemy ship
+  -- if isJust selectedEntity' && (owner (fromJust clickedShip) == 2)
+  --   then
+  --     writeIORef moveList (Attack 1 2:moveList')
+  --   else
+  --     writeIORef moveList moveList'
 
   Lock.release selectedEntityLock
   Lock.release moveListLock
