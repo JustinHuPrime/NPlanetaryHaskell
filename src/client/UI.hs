@@ -35,6 +35,7 @@ display board boardLock = do
 
   Lock.acquire boardLock
   board' <- readIORef board
+  print (length board')
   Lock.release boardLock
 
   renderBoard board'
@@ -48,13 +49,13 @@ reshape size = do
   postRedisplay Nothing
 
 --- handles keyboard and mouse events
-keyboardMouse :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> KeyboardMouseCallback
-keyboardMouse socket board boardLock moveList moveListLock key keyState _ mousePos = do
+keyboardMouse :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> IORef (Maybe Entity) -> Lock.Lock -> KeyboardMouseCallback
+keyboardMouse socket board boardLock moveList moveListLock selectedEntity selectedEntityLock key keyState _ mousePos = do
   Lock.acquire boardLock
   board' <- readIORef board
   Lock.release boardLock
 
-  handleMoves board' moveList moveListLock key keyState mousePos
+  handleMoves board' moveList moveListLock selectedEntity selectedEntityLock key keyState mousePos
   sendMovesToServer socket board boardLock moveList moveListLock key keyState
 
 --- handles idling

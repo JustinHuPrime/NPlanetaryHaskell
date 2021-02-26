@@ -55,16 +55,39 @@ getClickedMapPos :: Key -> KeyState -> Position -> Maybe Vec2
 getClickedMapPos (MouseButton RightButton) Up (Position x y) = Just (windowToWorld (fromIntegral x, fromIntegral y))
 getClickedMapPos _ _ _ = Nothing
 
-handleMoves :: Board -> IORef [Move] -> Lock.Lock -> Key -> KeyState -> Position -> IO ()
-handleMoves board moveList moveListLock key keyState mousePos = do
-  Lock.acquire moveListLock
+handleMoves :: Board -> IORef [Move] -> Lock.Lock -> IORef (Maybe Entity) -> Lock.Lock -> Key -> KeyState -> Position -> IO ()
+handleMoves board moveList moveListLock selectedEntity selectedEntityLock key keyState mousePos = do
   let clickedShip = getClickedShip key keyState mousePos board
-  if isJust clickedShip then print "clicked" else return ()
-
   let clickedMapPos = getClickedMapPos key keyState mousePos
 
-  let updatedMoveList = [Thrust (Board.idNum (fromJust clickedShip)) (1, 0) | isJust clickedShip]
-  writeIORef moveList updatedMoveList
+  Lock.acquire moveListLock
+  Lock.acquire selectedEntityLock
+
+  moveList' <- readIORef moveList
+  selectedEntity' <- readIORef selectedEntity
+
+  -- -- select new player ship
+  -- if isJust clickedShip && (owner (fromJust clickedShip) == 1)
+  --   then
+  --     writeIORef selectedEntity clickedShip
+  --   else
+  --     writeIORef selectedEntity selectedEntity'
+
+  -- -- thrust toward board position
+  -- if isJust selectedEntity' && isJust clickedMapPos
+  --   then
+  --     writeIORef moveList (Thrust 1 (vecUnit (fromJust clickedMapPos)):moveList')
+  --   else
+  --     writeIORef moveList moveList'
+
+  -- -- attack enemy ship
+  -- if isJust selectedEntity' && (owner (fromJust clickedShip) == 2)
+  --   then
+  --     writeIORef moveList (Attack 1 2:moveList')
+  --   else
+  --     writeIORef moveList moveList'
+
+  Lock.release selectedEntityLock
   Lock.release moveListLock
 
 sendMovesToServer :: Socket -> IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Key -> KeyState -> IO ()
@@ -81,5 +104,7 @@ sendMovesToServer _ _ _ _ _ _ _ = return ()
 
 updateBoardState :: Socket -> IORef Board -> Lock.Lock -> IO ()
 updateBoardState socket board boardLock = do
+  Lock.acquire boardLock
   board' <- readBoard socket
   writeIORef board board'
+  Lock.release boardLock

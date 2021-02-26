@@ -31,8 +31,8 @@ import System.Exit
 import Theme
 import UI
 
-openWindow :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> Socket -> IO ()
-openWindow board boardLock moveList moveListLock s = do
+openWindow :: IORef Board -> Lock.Lock -> IORef [Move] -> Lock.Lock -> IORef (Maybe Entity) -> Lock.Lock -> Socket -> IO ()
+openWindow board boardLock moveList moveListLock selectedEntity selectedEntityLock s = do
   board' <- readBoard s
   writeIORef board board'
 
@@ -44,18 +44,11 @@ openWindow board boardLock moveList moveListLock s = do
 
   displayCallback $= display board boardLock
   -- TODO: add more input callbacks as needed
-  keyboardMouseCallback $= Just (keyboardMouse s board boardLock moveList moveListLock)
+  keyboardMouseCallback $= Just (keyboardMouse s board boardLock moveList moveListLock selectedEntity selectedEntityLock)
   idleCallback $= Just (idle board boardLock)
   closeCallback $= Just (close s)
 
   mainLoop
-
-initBoard :: Board
-initBoard = [
-  Ship 0 (  0,   0) (0, 0) 2 "test_0" 0 False 0 0 0 0 0,
-  Ship 1 ( 25,  25) (0, 0) 2 "test_1" 0 False 0 0 0 0 0,
-  Ship 2 (-25, -25) (0, 0) 2 "test_2" 0 False 0 0 0 0 0
-  ]
 
 client :: String -> IO ()
 client serverAddr = do
@@ -63,8 +56,10 @@ client serverAddr = do
   boardLock <- Lock.new
   moveList <- newIORef [] :: IO (IORef [Move])
   moveListLock <- Lock.new
+  selectedEntity <- newIORef Nothing :: IO (IORef (Maybe Entity))
+  selectedEntityLock <- Lock.new
   addr <- resolve serverAddr
-  E.bracket (open addr) close (openWindow board boardLock moveList moveListLock)
+  E.bracket (open addr) close (openWindow board boardLock moveList moveListLock selectedEntity selectedEntityLock)
   exitSuccess
   where
     resolve addr = do
