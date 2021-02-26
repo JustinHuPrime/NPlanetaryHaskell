@@ -36,13 +36,20 @@ group =
         ],
       testGroup
         "attack order tests"
-        [ testCase "simple attack" test_simpleAttack
+        [ testCase "simple attack" test_simpleAttack,
+        testCase "test attack where attacker has less strength" test_terribleOddsAttack,
+        testCase "test attack where attacker has more strength" test_phenomenalOddsAttack
         ]
     ]
 
 simpleTestBoard :: Board
 simpleTestBoard = [ newShip Cruiser 2 (0, 5) (0.1, 0.3) 1 "P1 Cruiser",
     newShip Cruiser 3 (0, -5) (0, 0) 2 "P2 Cruiser"
+  ]
+
+skewedTestBoard :: Board
+skewedTestBoard = [ newShip Battleship 2 (0, 5) (0.1, 0.3) 1 "P1 BattleShip",
+    newShip Corvette 3 (0, -5) (0, 0) 2 "P2 Corvette"
   ]
 
 test_simpleThrust :: Assertion
@@ -56,4 +63,18 @@ test_simpleAttack = do setStdGen (mkStdGen 5)
                        actual <- resolveOrder simpleTestBoard Attack {attacker = 2, target = 3}
                        actual @?= [ Ship {Board.idNum = 2, position = (0, 5), velocity = (0.1, 0.3), owner = 1, name = "P1 Cruiser", strength = 8, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 0, structureDamage = 0},
                           Ship {Board.idNum = 3, position = (0, -5), velocity = (0, 0), owner = 2, name = "P2 Cruiser", strength = 8, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 2, structureDamage = 0}
-                          ]
+                          ] 
+
+test_terribleOddsAttack :: Assertion
+test_terribleOddsAttack = do setStdGen (mkStdGen 5)
+                             actual <- resolveOrder skewedTestBoard Attack {attacker = 3, target = 2}
+                             actual @?= [ Ship {Board.idNum = 2, position = (0, 5), velocity = (0.1, 0.3), owner = 1, name = "P1 BattleShip", strength = 15, isDefensive = False, fuelCapacity = 15, fuel = 15, weaponDamage = 0, driveDamage = 0, structureDamage = 0},
+                                 Ship {Board.idNum = 3, position = (0, -5), velocity = (0, 0), owner = 2, name = "P2 Corvette", strength = 2, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 0, driveDamage = 0, structureDamage = 0}
+                                  ]
+
+test_phenomenalOddsAttack :: Assertion
+test_phenomenalOddsAttack = do setStdGen (mkStdGen 5)
+                               actual <- resolveOrder skewedTestBoard Attack {attacker = 2, target = 3}
+                               actual @?= [ Ship {Board.idNum = 2, position = (0, 5), velocity = (0.1, 0.3), owner = 1, name = "P1 BattleShip", strength = 15, isDefensive = False, fuelCapacity = 15, fuel = 15, weaponDamage = 0, driveDamage = 0, structureDamage = 0},
+                                 Ship {Board.idNum = 3, position = (0, -5), velocity = (0, 0), owner = 2, name = "P2 Corvette", strength = 2, isDefensive = False, fuelCapacity = 20, fuel = 20, weaponDamage = 1, driveDamage = 2, structureDamage = 0}
+                                  ]
