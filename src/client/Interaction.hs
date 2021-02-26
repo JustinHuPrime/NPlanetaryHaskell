@@ -103,7 +103,7 @@ sendMovesToServer socket board boardLock moveList moveListLock (SpecialKey KeyUp
   sendMoves socket moveList'
   writeIORef moveList []
   print "sent"
-  -- updateBoardState socket board boardLock
+  updateBoardState socket board boardLock
   print "board updated"
   Lock.release moveListLock
 sendMovesToServer _ _ _ _ _ _ _ = return ()

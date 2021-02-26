@@ -35,7 +35,6 @@ display board boardLock = do
 
   Lock.acquire boardLock
   board' <- readIORef board
-  print (length board')
   Lock.release boardLock
 
   renderBoard board'
