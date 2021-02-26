@@ -65,6 +65,7 @@ handler s board newBoardSem sentBoardSem moveList moveListLock numPlayers player
           then do
             updated <- updateBoard (concat ml) board'
             writeIORef board updated
+            writeIORef moveList []
             signalQSemN newBoardSem (numPlayers - 1)
             sendBoard s (filterVisible updated playerId)
             waitQSemN sentBoardSem (numPlayers - 1)
